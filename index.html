@@ -1,0 +1,2431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JEE Tracker</title>
+<meta name="theme-color" content="#33409E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JEE Tracker">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkpFRSBUcmFja2VyIiwgInNob3J0X25hbWUiOiAiSkVFIFRyYWNrZXIiLCAiZGVzY3JpcHRpb24iOiAiVHJhY2sgeW91ciBKRUUgTWFpbiAmIEFkdmFuY2VkIHByZXBhcmF0aW9uIC0gc3lsbGFidXMsIHRlc3RzLCByZXZpc2lvbnMgYW5kIHN0dWR5IHNlc3Npb25zLiIsICJzdGFydF91cmwiOiAiLi8iLCAic2NvcGUiOiAiLi8iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI0ZBRjlGNiIsICJ0aGVtZV9jb2xvciI6ICIjMzM0MDlFIiwgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0LXByaW1hcnkiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNQUFBQURBQ0FJQUFBRGR2dnRRQUFBRVUwbEVRVlI0bk8zYlRZaVVkUURIOFpsZGF5TnNOUW94STR0ZXhDQ0t0S0FnUXc5ZDZ1S3Bya0lRUmFlaWkwRlFRWWVnb0VQUkpTUUloUExRSVJTUklxU01TakZ4MHkyMTFUUTFYZGMxMzlhZGZaa3VDMHNneWo2L0o1NTluTS9uL3YvelkvZ3l1L013MDF5K2NsMERpdXFxZWdEMUppQWlBaUlpSUNJQ0lpSWdJZ0lpSWlBaUFpSWlJQ0lDSWlJZ0lnSWlJaUFpQWlJaUlDSUNJaUlnSWdJaUlpQWlBaUlpSUNJQ0lpSWdJZ0lpSWlBaUFpSWlJQ0lDSWlJZ0lnSWlJaUFpQWlJaUlDSUNJaUlnSWdJaUlpQWlBaUlpSUNJQ0lpSWdJZ0lpSWlBaUFpSWlJQ0p6cWg0d2l6ejkxRDF2di81a3NiTnZ2ZnY5VjV2M2w3dW5GcndERVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUVSRVJBUkFSRVJFQkVCRVJFUUVRRVJFUkFSQVJFUkVCRUJFUkVRRVFFUkVSQVJBUkVSRUJFQkVSRVFFUUZOYXphYmhjOU9UclpMWEZJakFwcDIwOXpyQzU4ZGJZMlh1S1JHQkRRdENtaDBvc1FsTlNLZ2FmUG4zVkQ0N09pb2Q2Q090M1RKTFlYUERwKzVWT0tTR2hIUWxPN3VycVgzRlEvb3hPQ0ZFc2ZVaUlDbVBQVEFncDZlN21Kbkw0Mk9uejNYS25kUFhRaG95ck9yN3k5ODl2Q1JzeVV1cVJjQk5ScU54cUtGYzFldFdGejRlUCsrVXlXT3FSY0JOYnFhelRmWHJ1anVMdjVTOU84YktuRlB2UWlvOGRMenk1WTl1REM1WVZmZmliTEcxTTZjcWdkVXFidTdhKzByajY5K1prbHl5Ykcveng4WUdDNXJVdTEwYUVETlptUFZFM2Urc09iaGUrKytPYnpxdXgrT2xES3Bwam9sb092bWRQWDI5c3pyN2JscjhmeEhsOTMyMkNPTDdyaTl0NVNiTjI0NVVNbzlOWFdOQjdScHczTUxicjN4Lzd1L2IrL2czdDg3OXlOWXd6L1JvZlViOWxROW9XSUNLbTdQYjROZmJ6MVk5WXFLQ2FpZ2Rydngvb2MvdHp2MGEyVFRCRlRRWjUvMzdkNXpzdW9WMVJOUUVYMTdCei82WkdmVksyWUZBYzNZNGIvT3Z2YkdOeE1UazFVUG1SVUVORFBIanA5NzhkWE5RNmRIcWg0eVd3aG9CbmIxblZqejhzYVRuZnJkc2N1NnhoOGtsbVd5M2Y3aXkvNFBQdDQrUHU0djEzOEk2T3IyRHd5Lzg5NjJYL3NIcXg0eUd3bm9TZzRNREgrNmZ2ZVdidzkyN084R3IwcEFsM0Z4Wkd6cnRzT2J0dnp4NDQ2akhoVmVtWUNtdE51TmdVUEQyMzg1dm4zbjhaOTJITHZVcWIvem1xa09DbWl5M1I1clRiYkdKbHF0aVhQblcwT25SNFpPajV3OGRlSGduLzhNSEJvZU9IVG13c1d4cWpmV1QzUDV5blZWYjZER1BBY2lJaUFpQWlJaUlDSUNJaUlnSWdJaUlpQWlBaUlpSUNJQ0lpSWdJZ0lpSWlBaUFpSWlJQ0lDSWlJZ0lnSWlJaUFpQWlJaUlDSUNJaUlnSWdJaUlpQWlBaUlpSUNJQ0lpSWdJZ0lpSWlBaUFpSWlJQ0lDSWlJZ0lnSWlJaUFpQWlJaUlDSUNJaUlnSWdJaUlpQWlBaUlpSUNML0Fuc3h6SkZTa2ZQK0FBQUFBRWxGVGtTdVFtQ0MiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9LCB7InNyYyI6ICJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQUlBQUFCN0drT3RBQUFNOTBsRVFWUjRuTzNkMlkrZGRRSEc4V21uT3hRUXlsNlF2VklXalVSSUNCY2tCZ21MRXBjWUZDVnF2REF4OFFJMGFpQkVFcUpJbEdCQUlTSW9rc0FGYUNBQnRHZ0xoZExhVnBBQ2xkS1UwcGFaMGc1MG1KbDJscDZaYzQ0WExnazRuYVdkOGp0bm5zL25MM2d1NXVRNzd6bnYrLzZtbkhQaHZTMEE1SmxhZWdBQVpRZ0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNocHBVZUFCTmc0WUo1djcvcjA2Vlg3TkZqaXpiODZPWm5TNitBOTNNRkFCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQU5qdjZ2VjY2UWt3REFGZ01wZzJyYUgva21zMUFhQVJOZlRIQnNabzVvelcwaE5HVXEwS0FJMUlBSmdNWmpSMkFJYUdhcVVud0RBRWdNbWcwUU5RRlFBYWtRQXdHUnd3WjNycENTTnhCVUJqRWdBbWczbUh6U2s5WVNSOS9VT2xKOEF3QklESllONWhzMHRQR0VsdmI2WDBCQmlHQURBWnpEdTBvYThBZXZzR1MwK0FZUWdBazhIUlJ4MVFlc0pJQklER0pBQTB2U2xUV2s0NjRVT2xWNHlrdTJkMzZRa3dEQUdnNlIxNzlOelpzNmFWWGpHU3pzNyswaE5nR0FKQTB6djV4SWIrOTcrbHBlVWRBYUFoQ1FCTjcrd3pqaWc5WVNSRFE3V2R1M3dGUkNNU0FKcmV1ZWNjVTNyQ1NIWjA5bnNaS0kxSkFHaHVCODJkc2VEVVEwdXZHRW43dHAybEo4RHdCSURtZHQ0NXgwNmRNcVgwaXBHMGJ4VUFHcFFBME53dXVlaWswaE5HMGY3V3J0SVRZSGdDUUJNNzVPQlo1NTg3di9TS1ViUzE5NVNlQU1NVEFKcll4Wjg4c2NIUEFtdHBhZG00dWF2MEJCaGVvMzk0WUU5YVc2ZGU5WVV6U3E4WVJiVmEyN1M1dS9RS0dKNEEwS3d1dmVqa1k0NmVXM3JGS0RhMzlWUUdxNlZYd1BBRWdLYlUyanIxNjFlZFhYckY2RFpzZkxmMEJOZ2pBYUFwWFgzbG1jZlBQNmowaXRHdGZmWHQwaE5nandTQTVqUC9tTG5mL09ySFNxOFlrNWZXZHBTZUFIc2tBRFNaMXRhcE4zei9ncGt6Ry9vVStIK3JERmJYcmQ5UmVnWHNrUURRWks3OTlya2ZQL3VvMGl2RzVOWFhkZ3c2RHA0R0pnQTBreXN1UGUyTG56Mjk5SXF4V3ZYQzF0SVRZQ1FDUU5PNDdGT25YSGZ0K2FWWGpNT0tWZTJsSjhCSUd2b2NKZmlmejEyKzRJZlhuTi9ZcjMxN2o1MjdLcSs0QllqR0pnQTB1dW5UcG43blc1LzQwdWNYbGg0eVBxdWUzMXFyT1FlQWhpWUFOTFJqajU3N2t4c3VYUGlSZWFXSGpOdmlaemFWbmdDakVBQWExS3laMDc3MjViT3V2dktzR1RPYTRJN1A5NmxVcXN0V3RKVmVBYU1RQUJyTzdGblRMcnY0bEc5ODVhTkh6SnRUZXN0ZWVtNWxXMS8vWU9rVk1Bb0JvSUdjZE1JaG43bmsxQ3N1UFczdWdUTktiOWtuaTVac0xEMEJSaWNBRkhiQW5Pa0xGOHc3Lzd6NUYxNXcvSEhITnNIcmZVYjFidGZBMG1WYlNxK0EwUWtBKzkyVUtTM1RwN2ZPbXRrNmErYTAyYk9uSDNuNG5DT1BPUENvSXc0NGJ2NUJDeGZNKy9CeEJ6ZlJ6WjFqOGRpaURSNEFwaWtJQUJQbWQ3KzYvTXpURHkrOW9yQjZ2ZVdSeDllWFhnRmo0a2xnbUVqTFY3VnRmdE1SWURRSEFZQ0pkTitETDVlZUFHTWxBREJoMXE1Nys0VTEyMHF2Z0xFU0FKZ3c5OXkvcHZRRUdBY0JnSW14NXBXT1o1YS9XWG9GaklNQXdNUzQvZGQvTHowQnhrY0FZQUk4OWV6bUYxL2VYbm9Gakk4QXdMN3FIeGo2K1IwclM2K0FjUk1BMkZkMzMvZml0bzdlMGl0ZzNBUUE5c242MXpzZmVIaHQ2Uld3TndRQTlsNmxVcjMrcHFWRDN2eERjeElBMkh0MzNQMzh4azFkcFZmQVhoSUEyRXZQcld4NzhBKysvS0dKQ1FEc2pTMXRQZGZmdExUdTFIZWFtUURBdVBYMUQzNzMrc1U3ZDFWS0Q0RjlJZ0F3UHRWcTdRYzNQcjF4YzFmcEliQ3ZCQURHb1Y1dnVmR1daY3RYdHBVZUFoTkFBR0FjYnJ0ejFSTlB2bDU2QlV3TVIwTENXTjM2eTFXZStXSXlFUUFZWGIzZWNzc3ZWanowNkxyU1EyQWlDUUNNb2pKWXZmR255eFl0M2xoNkNFd3dBWUNSZEhVUFhIUGQ0cGZXZHBRZUFoTlBBR0NQMW0vby9ONE5TOXJmMmxsNkNPd1hBZ0REKytOanIvM3M5cFdWU3JYMEVOaGZCQURlcjJkbjVlYmJsais1NUkzU1EyRC9FZ0I0ajJlV2IvbnhyU3ZlMmRGWGVnanNkd0lBLy9IT2pyN2I3bHo5WjNmN0VFTUFvR1Z3cVBiZ3cydC9jLythdnI3QjBsdmdneU1BUkt2VjYzOTlldE9kOTd6d1pudFA2UzN3UVJNQVF0WHJMVTg5dSttdTMvN0RrVjdFRWdEaVZDclZKLzd5K2dNUHJmVktaOElKQUVHMmRmUSs4dmo2aHg5ZDE5VTlVSG9MbENjQVRINlZTdlhwWlZzZS9kUDYxYysvVlhPS0kveVhBREJwN2Q1ZFhiRzZmY2t6bTVZK3Q2WFg3VDN3ZndTQXllYXQ3YnYrdG5ycmlsVnRLMWEzOXc4TWxaNERqVXNBbUF5MmQvU3VlYVhqeFZlMnIzcCs2Nll0M2FYblFITVFBSnBTNTd2OXIyM29YTCtoYzkzNkhTLzlzMk43UjIvcFJkQjhCSUJHMTljM3VLMmp0MjFyejVhMm5pMXY5bXh1NjM1alUxZG5sOXQ0WUY4SkFCK2NlcjJsVnF0VnEvVnFyVjZ0MWlxRHRZSCt3ZjZCb2Y2Qm9iNytvVjI5bGU3dTNkMDlBMTNkdTd1NkIzWjA5bTkvdTNkN1I2L2ZiMkUvbVhMT2hmZVczZ0JBQVZOTER3Q2dEQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0UraGZZVUJFUytwMDVuUUFBQUFCSlJVNUVya0pnZ2c9PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn1dfQ==">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAEU0lEQVR4nO3bTYiUdQDH8ZldayNsNQoxI4texCCKtKAgQw9d6uKprkIQRaeii0FQQYegoEPRJSQIhPLQIRSRIqSMSjFx0y211TQ1Xdc139adfZkuC0sgyj6/J559nM/n/v/zY/gyu/Mw01y+cl0DiuqqegD1JiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICJzqh4wizz91D1vv/5ksbNvvfv9V5v3l7unFrwDEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQFNazabhc9OTrZLXFIjApp209zrC58dbY2XuKRGBDQtCmh0osQlNSKgafPn3VD47Oiod6COt3TJLYXPDp+5VOKSGhHQlO7urqX3FQ/oxOCFEsfUiICmPPTAgp6e7mJnL42Onz3XKndPXQhoyrOr7y989vCRsyUuqRcBNRqNxqKFc1etWFz4eP++UyWOqRcBNbqazTfXrujuLv5S9O8bKnFPvQio8dLzy5Y9uDC5YVffibLG1M6cqgdUqbu7a+0rj69+ZklyybG/zx8YGC5rUu10aEDNZmPVE3e+sObhe+++Obzqux+OlDKppjoloOvmdPX29szr7blr8fxHl9322COL7ri9t5SbN245UMo9NXWNB7Rpw3MLbr3x/7u/b+/g3t879yNYwz/RofUb9lQ9oWICKm7Pb4Nfbz1Y9YqKCaigdrvx/oc/tzv0a2TTBFTQZ5/37d5zsuoV1RNQEX17Bz/6ZGfVK2YFAc3Y4b/OvvbGNxMTk1UPmRUENDPHjp978dXNQ6dHqh4yWwhoBnb1nVjz8saTnfrdscu6xh8klmWy3f7iy/4PPt4+Pu4v138I6Or2Dwy/8962X/sHqx4yGwnoSg4MDH+6fveWbw927O8Gr0pAl3FxZGzrtsObtvzx446jHhVemYCmtNuNgUPD2385vn3n8Z92HLvUqb/zmqkOCmiy3R5rTbbGJlqtiXPnW0OnR4ZOj5w8deHgn/8MHBoeOHTmwsWxqjfWT3P5ynVVb6DGPAciIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICL/AnsxzJFSkfP+AAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAEU0lEQVR4nO3bTYiUdQDH8ZldayNsNQoxI4texCCKtKAgQw9d6uKprkIQRaeii0FQQYegoEPRJSQIhPLQIRSRIqSMSjFx0y211TQ1Xdc139adfZkuC0sgyj6/J559nM/n/v/zY/gyu/Mw01y+cl0DiuqqegD1JiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICJzqh4wizz91D1vv/5ksbNvvfv9V5v3l7unFrwDEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQFNazabhc9OTrZLXFIjApp209zrC58dbY2XuKRGBDQtCmh0osQlNSKgafPn3VD47Oiod6COt3TJLYXPDp+5VOKSGhHQlO7urqX3FQ/oxOCFEsfUiICmPPTAgp6e7mJnL42Onz3XKndPXQhoyrOr7y989vCRsyUuqRcBNRqNxqKFc1etWFz4eP++UyWOqRcBNbqazTfXrujuLv5S9O8bKnFPvQio8dLzy5Y9uDC5YVffibLG1M6cqgdUqbu7a+0rj69+ZklyybG/zx8YGC5rUu10aEDNZmPVE3e+sObhe+++Obzqux+OlDKppjoloOvmdPX29szr7blr8fxHl9322COL7ri9t5SbN245UMo9NXWNB7Rpw3MLbr3x/7u/b+/g3t879yNYwz/RofUb9lQ9oWICKm7Pb4Nfbz1Y9YqKCaigdrvx/oc/tzv0a2TTBFTQZ5/37d5zsuoV1RNQEX17Bz/6ZGfVK2YFAc3Y4b/OvvbGNxMTk1UPmRUENDPHjp978dXNQ6dHqh4yWwhoBnb1nVjz8saTnfrdscu6xh8klmWy3f7iy/4PPt4+Pu4v138I6Or2Dwy/8962X/sHqx4yGwnoSg4MDH+6fveWbw927O8Gr0pAl3FxZGzrtsObtvzx446jHhVemYCmtNuNgUPD2385vn3n8Z92HLvUqb/zmqkOCmiy3R5rTbbGJlqtiXPnW0OnR4ZOj5w8deHgn/8MHBoeOHTmwsWxqjfWT3P5ynVVb6DGPAciIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICL/AnsxzJFSkfP+AAAAAElFTkSuQmCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  --paper:#FAF9F6;
+  --paper-2:#F1EFE9;
+  --ink:#1B2233;
+  --ink-soft:#5B6178;
+  --line:#E4E1D8;
+  --indigo:#33409E;
+  --indigo-deep:#242C74;
+  --indigo-tint:#EBEDFA;
+  --amber:#DD9A2E;
+  --amber-tint:#FBF0DC;
+  --green:#2F9E63;
+  --green-tint:#E4F6EC;
+  --red:#D14B4B;
+  --red-tint:#FCE9E9;
+  --slate:#8B90A3;
+  --card:#FFFFFF;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:22px;
+  --shadow:0 1px 2px rgba(27,34,51,.04), 0 6px 20px rgba(27,34,51,.06);
+  --font-head:'Lexend',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="dark"]{
+  --paper:#12141C;
+  --paper-2:#181B26;
+  --ink:#EDEFF7;
+  --ink-soft:#9BA0B4;
+  --line:#2A2E3E;
+  --indigo:#6C7BE8;
+  --indigo-deep:#8993EF;
+  --indigo-tint:#1D2247;
+  --amber:#E8AE4D;
+  --amber-tint:#332714;
+  --green:#4FBE8A;
+  --green-tint:#12291E;
+  --red:#E1706F;
+  --red-tint:#33191A;
+  --slate:#767C93;
+  --card:#1B1E2A;
+  --shadow:0 1px 2px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.35);
+}
+button{color:inherit;}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  margin:0;
+  height:100%;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s ease, color .25s ease;
+}
+h1,h2,h3,h4{font-family:var(--font-head); margin:0; color:var(--ink); letter-spacing:-0.01em;}
+p{margin:0}
+button{font-family:inherit}
+input,select,textarea{font-family:inherit}
+a{color:inherit}
+::selection{background:var(--indigo); color:#fff;}
+
+.app{
+  display:flex;
+  min-height:100%;
+}
+
+/* ---------- Sidebar (desktop) ---------- */
+.sidebar{
+  width:236px;
+  flex-shrink:0;
+  background:var(--paper-2);
+  border-right:1px solid var(--line);
+  padding:24px 14px;
+  display:none;
+  flex-direction:column;
+  gap:4px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  padding:6px 12px 22px 12px;
+}
+.brand-mark{
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:20px;
+  color:var(--indigo);
+}
+.brand-sub{font-size:11px; color:var(--ink-soft); font-weight:500;}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 14px;
+  border-radius:12px;
+  color:var(--ink-soft);
+  font-weight:600;
+  font-size:14.5px;
+  cursor:pointer;
+  border:none;
+  background:none;
+  text-align:left;
+  width:100%;
+}
+.nav-item svg{width:19px; height:19px; flex-shrink:0;}
+.nav-item:hover{background:var(--indigo-tint); color:var(--indigo);}
+.nav-item.active{background:var(--indigo); color:#fff;}
+.sidebar-foot{margin-top:auto; padding:12px; font-size:11.5px; color:var(--slate);}
+
+/* ---------- Main ---------- */
+.main{
+  flex:1;
+  min-width:0;
+  padding:18px 16px 96px 16px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+.topbar h1{font-size:22px; font-weight:700;}
+.topbar .date-pill{
+  font-size:12.5px; color:var(--ink-soft); font-weight:500;
+  background:var(--paper-2); padding:6px 12px; border-radius:20px; border:1px solid var(--line);
+}
+
+.view{display:none;}
+.view.active{display:block; animation:fadein .28s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion:reduce){.view.active{animation:none} *{transition:none !important}}
+
+/* ---------- Cards & Grid ---------- */
+.grid{display:grid; gap:12px;}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:640px){
+  .grid-3{grid-template-columns:repeat(2,1fr);}
+  .grid-4{grid-template-columns:repeat(2,1fr);}
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+.card-flat{
+  background:var(--paper-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:16px;
+}
+.section-title{
+  font-size:15px; font-weight:700; margin:26px 0 10px 0; color:var(--ink);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.section-title:first-child{margin-top:0;}
+.muted{color:var(--ink-soft); font-size:12.5px;}
+
+/* ---------- Hero countdown ---------- */
+.hero{
+  background:linear-gradient(135deg, var(--indigo-deep), var(--indigo));
+  border-radius:var(--radius-lg);
+  padding:22px;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.hero-row{display:flex; gap:14px; flex-wrap:wrap;}
+.hero-exam{flex:1; min-width:130px;}
+.hero-exam .label{font-size:12px; opacity:.75; font-weight:600; text-transform:none;}
+.hero-exam .num{font-family:var(--font-head); font-size:40px; font-weight:800; line-height:1.05; margin-top:2px;}
+.hero-exam .num span{font-size:16px; font-weight:600; opacity:.8;}
+.hero-exam .sub{font-size:11.5px; opacity:.7; margin-top:2px;}
+.hero-divider{width:1px; background:rgba(255,255,255,.2); align-self:stretch;}
+
+/* ---------- Stat tiles ---------- */
+.stat{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+  padding:14px; display:flex; flex-direction:column; gap:6px;
+}
+.stat .icon{width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; margin-bottom:2px;}
+.stat .icon svg{width:16px; height:16px;}
+.stat .val{font-family:var(--font-head); font-size:22px; font-weight:700;}
+.stat .lbl{font-size:12px; color:var(--ink-soft); font-weight:500;}
+
+/* progress bars */
+.pbar{height:8px; border-radius:6px; background:var(--paper-2); overflow:hidden; margin-top:8px;}
+.pbar > div{height:100%; border-radius:6px; background:var(--indigo); transition:width .4s ease;}
+.pbar.amber > div{background:var(--amber);}
+.pbar.green > div{background:var(--green);}
+.pbar-row{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); margin-bottom:2px;}
+
+/* quick actions */
+.qa-row{display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+.qa-btn{
+  flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 16px;
+  cursor:pointer; min-width:84px; font-size:11.5px; font-weight:600; color:var(--ink);
+}
+.qa-btn .qico{width:34px; height:34px; border-radius:10px; background:var(--indigo-tint); color:var(--indigo); display:flex; align-items:center; justify-content:center;}
+.qa-btn .qico svg{width:17px; height:17px;}
+.qa-btn:active{transform:scale(.96);}
+
+/* buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 18px; border-radius:12px; border:none; font-weight:600; font-size:14px;
+  cursor:pointer; background:var(--indigo); color:#fff;
+}
+.btn:active{transform:scale(.98);}
+.btn.secondary{background:var(--paper-2); color:var(--ink); border:1px solid var(--line);}
+.btn.danger{background:var(--red);}
+.btn.ghost{background:transparent; color:var(--indigo); padding:8px 10px;}
+.btn.block{width:100%;}
+.btn.sm{padding:7px 12px; font-size:12.5px; border-radius:9px;}
+.fab{
+  position:fixed; right:18px; bottom:86px; z-index:40;
+  width:56px; height:56px; border-radius:50%; background:var(--indigo); color:#fff;
+  display:flex; align-items:center; justify-content:center; border:none; box-shadow:0 8px 20px rgba(51,64,158,.35);
+  cursor:pointer;
+}
+.fab svg{width:24px; height:24px;}
+@media (min-width:900px){.fab{bottom:28px;}}
+
+/* forms */
+.field{margin-bottom:13px;}
+.field label{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px;}
+.field input, .field select, .field textarea{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+  background:var(--paper); color:var(--ink); font-size:14.5px;
+}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--indigo); outline-offset:1px;}
+.field-row{display:flex; gap:10px;}
+.field-row > .field{flex:1;}
+.seg{display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+.seg button{flex:1; padding:9px 6px; background:var(--paper); border:none; font-size:12.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; border-right:1px solid var(--line);}
+.seg button:last-child{border-right:none;}
+.seg button.active{background:var(--indigo); color:#fff;}
+
+/* list rows */
+.list{display:flex; flex-direction:column; gap:8px;}
+.row-item{
+  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 14px;
+  display:flex; align-items:center; gap:12px;
+}
+.row-item .ri-main{flex:1; min-width:0;}
+.row-item .ri-title{font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:8px;}
+.row-item .ri-sub{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+.row-item .ri-actions{display:flex; gap:6px; flex-shrink:0;}
+.icon-btn{
+  width:32px; height:32px; border-radius:9px; border:1px solid var(--line); background:var(--paper);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-soft);
+}
+.icon-btn svg{width:15px; height:15px;}
+.icon-btn:hover{color:var(--indigo); border-color:var(--indigo);}
+
+.badge{
+  font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap;
+}
+.badge.high{background:var(--red-tint); color:var(--red);}
+.badge.medium{background:var(--amber-tint); color:var(--amber);}
+.badge.low{background:var(--green-tint); color:var(--green);}
+.badge.done{background:var(--green-tint); color:var(--green);}
+.badge.pending{background:var(--paper-2); color:var(--ink-soft);}
+.badge.studying{background:var(--indigo-tint); color:var(--indigo);}
+.badge.notstarted{background:var(--paper-2); color:var(--slate);}
+.badge.revised{background:var(--amber-tint); color:var(--amber);}
+.badge.overdue{background:var(--red-tint); color:var(--red);}
+.badge.duetoday{background:var(--amber-tint); color:var(--amber);}
+.badge.upcoming{background:var(--indigo-tint); color:var(--indigo);}
+.badge.weak{background:var(--red-tint); color:var(--red);}
+.badge.average{background:var(--amber-tint); color:var(--amber);}
+.badge.strong{background:var(--green-tint); color:var(--green);}
+
+.checkline{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft);}
+.checkline input{width:16px; height:16px;}
+
+/* tabs (subject/section tabs) */
+.tabs{display:flex; gap:6px; overflow-x:auto; margin-bottom:14px; -webkit-overflow-scrolling:touch;}
+.tab{
+  flex:0 0 auto; padding:8px 15px; border-radius:20px; background:var(--paper-2); border:1px solid var(--line);
+  font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; white-space:nowrap;
+}
+.tab.active{background:var(--indigo); color:#fff; border-color:var(--indigo);}
+
+.searchbar{display:flex; gap:8px; margin-bottom:12px;}
+.searchbar input{flex:1;}
+.filter-row{display:flex; gap:8px; overflow-x:auto; margin-bottom:12px;}
+.filter-row select{flex:0 0 auto; min-width:120px;}
+
+/* empty state */
+.empty{
+  text-align:center; padding:38px 20px; color:var(--ink-soft);
+}
+.empty .ee{font-size:34px; margin-bottom:10px;}
+.empty h4{color:var(--ink); font-size:15px; margin-bottom:4px;}
+.empty p{font-size:13px;}
+
+/* modal */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(20,22,35,.45); z-index:100; display:none;
+  align-items:flex-end; justify-content:center;
+}
+.modal-backdrop.open{display:flex;}
+.modal{
+  background:var(--paper); width:100%; max-width:520px; border-radius:22px 22px 0 0;
+  padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px)) 18px; max-height:88vh; overflow-y:auto;
+  animation:slideup .25s ease;
+}
+@media (min-width:640px){
+  .modal-backdrop{align-items:center;}
+  .modal{border-radius:22px; max-height:82vh;}
+}
+@keyframes slideup{from{transform:translateY(30px); opacity:.6;} to{transform:translateY(0); opacity:1;}}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.modal-head h3{font-size:17px;}
+.modal-close{width:30px; height:30px; border-radius:50%; border:none; background:var(--paper-2); color:var(--ink-soft); cursor:pointer; display:flex; align-items:center; justify-content:center;}
+.modal-actions{display:flex; gap:10px; margin-top:6px;}
+.modal-actions .btn{flex:1;}
+
+/* toast */
+.toast{
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); padding:11px 18px; border-radius:24px; font-size:13.5px;
+  font-weight:500; z-index:200; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+:root[data-theme="dark"] .toast{background:#EDEFF7; color:#12141C;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+@media (min-width:900px){.toast{bottom:24px;}}
+
+/* bottom nav mobile */
+.bottomnav{
+  position:fixed; left:0; right:0; bottom:0; z-index:50;
+  background:var(--card); border-top:1px solid var(--line);
+  display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px)) 4px;
+}
+.bn-item{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px;
+  border:none; background:none; color:var(--ink-soft); font-size:10px; font-weight:600; cursor:pointer;
+}
+.bn-item svg{width:20px; height:20px;}
+.bn-item.active{color:var(--indigo);}
+@media (min-width:900px){
+  .bottomnav{display:none;}
+  .sidebar{display:flex;}
+  .main{padding:28px 34px 40px 34px;}
+}
+@media (max-width:899px){
+  .main{padding-bottom:88px;}
+}
+
+/* timer */
+.timer-display{
+  font-family:var(--font-mono); font-size:52px; font-weight:600; text-align:center; letter-spacing:1px;
+  padding:26px 0 10px 0; color:var(--ink);
+}
+.timer-mode-label{text-align:center; font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-bottom:4px;}
+.timer-controls{display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap;}
+.timer-controls .btn{min-width:96px;}
+
+/* bar chart (css based) */
+.barchart{display:flex; align-items:flex-end; gap:8px; height:140px; padding-top:10px;}
+.barchart .bcol{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:6px;}
+.barchart .bcol .bar{width:100%; max-width:26px; border-radius:6px 6px 3px 3px; background:var(--indigo); min-height:3px;}
+.barchart .bcol .blabel{font-size:10px; color:var(--ink-soft);}
+.barchart .bcol .bval{font-size:10px; color:var(--ink-soft); font-weight:600;}
+
+.hbar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.hbar-row .hb-label{width:88px; flex-shrink:0; font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+.hbar-row .hb-track{flex:1; height:10px; background:var(--paper-2); border-radius:6px; overflow:hidden;}
+.hbar-row .hb-track > div{height:100%; border-radius:6px;}
+.hbar-row .hb-val{width:38px; text-align:right; font-size:12px; font-weight:700; flex-shrink:0;}
+
+.two-col{display:grid; grid-template-columns:1fr; gap:12px;}
+@media (min-width:760px){.two-col{grid-template-columns:1.3fr 1fr;}}
+
+.chip-row{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{padding:6px 12px; border-radius:20px; background:var(--paper-2); border:1px solid var(--line); font-size:12px; font-weight:600; color:var(--ink-soft);}
+
+table.simple{width:100%; border-collapse:collapse; font-size:13px;}
+table.simple th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--slate); padding:6px 8px; border-bottom:1px solid var(--line);}
+table.simple td{padding:9px 8px; border-bottom:1px solid var(--line);}
+.table-wrap{overflow-x:auto;}
+
+.streak-flame{display:flex; align-items:center; gap:8px;}
+.streak-flame .num{font-family:var(--font-head); font-size:28px; font-weight:800; color:var(--amber);}
+
+@media print{ .sidebar,.bottomnav,.fab{display:none;} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar (desktop) -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">JEE</span><span class="brand-sub">Tracker</span></div>
+    <div id="sidebarNav"></div>
+    <div class="sidebar-foot" id="sidebarFoot">Keep going. Every chapter counts.</div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main" id="main">
+    <div class="topbar">
+      <h1 id="viewTitle">Home</h1>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="date-pill" id="topDate">—</span>
+        <button class="icon-btn" id="moreMenuBtn" aria-label="More" style="width:36px; height:36px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <section class="view" id="view-home"></section>
+    <!-- PLANNER -->
+    <section class="view" id="view-planner"></section>
+    <!-- CHAPTERS -->
+    <section class="view" id="view-chapters"></section>
+    <!-- PRACTICE -->
+    <section class="view" id="view-practice"></section>
+    <!-- TESTS -->
+    <section class="view" id="view-tests"></section>
+    <!-- REVISION -->
+    <section class="view" id="view-revision"></section>
+    <!-- ANALYTICS -->
+    <section class="view" id="view-analytics"></section>
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings"></section>
+    <!-- TIMER -->
+    <section class="view" id="view-timer"></section>
+
+  </main>
+</div>
+
+<!-- Bottom nav mobile -->
+<nav class="bottomnav" id="bottomnav"></nav>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" aria-label="Quick add">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- Modal root -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<input type="file" id="importFileInput" accept="application/json" style="display:none;">
+
+<script>
+/* ============================================================
+   JEE TRACKER — core state, storage, utilities
+   ============================================================ */
+const LS_KEY = 'jeeTrackerData_v1';
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
+const todayStr = () => new Date().toISOString().slice(0,10);
+const $ = (sel, root=document) => root.querySelector(sel);
+const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+function fmtDate(d){
+  if(!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+}
+function fmtDateShort(d){
+  const dt = new Date(d + 'T00:00:00');
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+}
+function daysBetween(a,b){
+  const A = new Date(a+'T00:00:00'), B = new Date(b+'T00:00:00');
+  return Math.round((B-A)/86400000);
+}
+function addDays(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+}
+function clamp(n,a,b){return Math.max(a, Math.min(b,n));}
+function pct(part, whole){ if(!whole) return 0; return clamp(Math.round((part/whole)*100),0,100); }
+function hoursToHM(hDecimal){
+  const h = Math.floor(hDecimal);
+  const m = Math.round((hDecimal-h)*60);
+  if(h<=0 && m<=0) return '0m';
+  if(h<=0) return m+'m';
+  if(m<=0) return h+'h';
+  return h+'h '+m+'m';
+}
+function secToClock(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  const pad = n => String(n).padStart(2,'0');
+  return h>0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+function esc(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------------- Default chapter lists ---------------- */
+const DEFAULT_CHAPTERS = {
+  Physics: [
+    "Units & Measurements","Kinematics","Laws of Motion","Work, Energy & Power",
+    "System of Particles & Rotational Motion","Gravitation","Mechanical Properties of Solids",
+    "Mechanical Properties of Fluids","Thermal Properties of Matter","Thermodynamics",
+    "Kinetic Theory of Gases","Oscillations","Waves","Electrostatics","Current Electricity",
+    "Moving Charges & Magnetism","Magnetism & Matter","Electromagnetic Induction",
+    "Alternating Current","Electromagnetic Waves","Ray Optics & Optical Instruments",
+    "Wave Optics","Dual Nature of Radiation & Matter","Atoms","Nuclei",
+    "Semiconductor Electronics","Experimental Skills"
+  ],
+  Chemistry: [
+    "Some Basic Concepts of Chemistry","Structure of Atom","Classification of Elements & Periodicity",
+    "Chemical Bonding & Molecular Structure","States of Matter","Thermodynamics",
+    "Equilibrium","Redox Reactions","Hydrogen","s-Block Elements","p-Block Elements (Group 13 & 14)",
+    "Organic Chemistry — Basic Principles","Hydrocarbons","Environmental Chemistry",
+    "Solid State","Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry",
+    "General Principles of Isolation of Elements","p-Block Elements (Group 15-18)",
+    "d and f Block Elements","Coordination Compounds","Haloalkanes & Haloarenes",
+    "Alcohols, Phenols & Ethers","Aldehydes, Ketones & Carboxylic Acids","Amines",
+    "Biomolecules","Polymers","Chemistry in Everyday Life"
+  ],
+  Mathematics: [
+    "Sets, Relations & Functions","Complex Numbers & Quadratic Equations",
+    "Matrices & Determinants","Permutations & Combinations","Binomial Theorem",
+    "Sequences & Series","Limits, Continuity & Differentiability","Integral Calculus",
+    "Differential Equations","Coordinate Geometry — Straight Lines","Coordinate Geometry — Circles",
+    "Conic Sections","Three Dimensional Geometry","Vector Algebra","Statistics & Probability",
+    "Trigonometry","Mathematical Reasoning","Application of Derivatives","Application of Integrals",
+    "Inverse Trigonometric Functions"
+  ]
+};
+
+/* ---------------- Data model / storage ---------------- */
+function defaultData(){
+  const chapters = [];
+  Object.keys(DEFAULT_CHAPTERS).forEach(subject=>{
+    DEFAULT_CHAPTERS[subject].forEach((name,i)=>{
+      chapters.push({
+        id: uid(), subject, name, status:'Not Started',
+        notesDone:false, questionsDone:false, pyqsDone:false,
+        revisionStatus:'Not Started', confidence:'Average',
+        order:i
+      });
+    });
+  });
+  return {
+    settings:{
+      studentName:'',
+      targetExam:'JEE Main + Advanced',
+      jeeMainDate: nextJuneDate(),
+      jeeAdvancedDate: nextJuneDate(30),
+      dailyStudyHours: 6,
+      dailyQuestionTarget: 60,
+      dailyTaskTarget: 4,
+      dailyRevisionTarget: 2,
+      pomodoroMinutes: 25,
+      pomodoroBreak: 5,
+      pomodoroLongBreak: 15,
+      theme: 'light',
+      revisionIntervals: [1,3,7,15],
+      minStudyMinutesForStreak: 15,
+      minQuestionsForStreak: 10,
+      minRevisionsForStreak: 1
+    },
+    tasks:[],
+    chapters,
+    practiceSessions:[],
+    tests:[],
+    revisions:[],
+    studySessions:[],
+    streaks:{ study:{current:0,longest:0,lastDate:null}, question:{current:0,longest:0,lastDate:null}, revision:{current:0,longest:0,lastDate:null} }
+  };
+}
+function nextJuneDate(offsetDays){
+  const now = new Date();
+  let y = now.getFullYear();
+  let d = new Date(y+'-06-01T00:00:00');
+  if(d < now) d = new Date((y+1)+'-06-01T00:00:00');
+  if(offsetDays) d.setDate(d.getDate()+offsetDays);
+  return d.toISOString().slice(0,10);
+}
+
+let DATA = null;
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      DATA = Object.assign(defaultData(), parsed);
+      // merge nested defaults in case of older backups
+      DATA.settings = Object.assign(defaultData().settings, parsed.settings||{});
+      DATA.streaks = Object.assign(defaultData().streaks, parsed.streaks||{});
+      if(!DATA.chapters || DATA.chapters.length===0) DATA.chapters = defaultData().chapters;
+    } else {
+      DATA = defaultData();
+      saveData();
+    }
+  }catch(e){
+    console.error('Load failed, resetting', e);
+    DATA = defaultData();
+    saveData();
+  }
+  return DATA;
+}
+function saveData(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(DATA));
+  }catch(e){
+    console.error('Save failed', e);
+    toast('Storage full — could not save.');
+  }
+}
+function updateData(mutatorFn){
+  mutatorFn(DATA);
+  saveData();
+}
+function deleteData(collection, id){
+  DATA[collection] = DATA[collection].filter(x=>x.id!==id);
+  saveData();
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `jee-tracker-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Backup downloaded');
+}
+function importDataFromFile(file){
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(!parsed || typeof parsed !== 'object') throw new Error('bad file');
+      DATA = Object.assign(defaultData(), parsed);
+      DATA.settings = Object.assign(defaultData().settings, parsed.settings||{});
+      DATA.streaks = Object.assign(defaultData().streaks, parsed.streaks||{});
+      saveData();
+      applyTheme();
+      renderAll();
+      toast('Data restored from backup');
+    }catch(err){
+      toast('Import failed — invalid file');
+    }
+  };
+  reader.readAsText(file);
+}
+function resetAllData(){
+  DATA = defaultData();
+  saveData();
+  applyTheme();
+  renderAll();
+  toast('All data reset');
+}
+/* ============================================================
+   DERIVED STATS
+   ============================================================ */
+function chapterCompletionPct(subject){
+  const chs = DATA.chapters.filter(c=> !subject || c.subject===subject);
+  if(chs.length===0) return 0;
+  const doneWeight = chs.reduce((sum,c)=>{
+    if(c.status==='Completed' || c.status==='Revised') return sum+1;
+    if(c.status==='Studying') return sum+0.5;
+    return sum;
+  },0);
+  return pct(doneWeight, chs.length);
+}
+function overallSyllabusPct(){
+  return chapterCompletionPct(null);
+}
+function subjectStats(subject){
+  const chs = DATA.chapters.filter(c=>c.subject===subject);
+  return {
+    total: chs.length,
+    completed: chs.filter(c=>c.status==='Completed'||c.status==='Revised').length,
+    remaining: chs.filter(c=>c.status==='Not Started'||c.status==='Studying').length,
+    weak: chs.filter(c=>c.confidence==='Weak').length
+  };
+}
+function todaysTasks(){
+  return DATA.tasks.filter(t=>t.date===todayStr());
+}
+function pendingTasksAll(){
+  return DATA.tasks.filter(t=>!t.completed);
+}
+function practiceForDate(dateStr){
+  return DATA.practiceSessions.filter(p=>p.date===dateStr);
+}
+function questionsSolvedOn(dateStr){
+  return practiceForDate(dateStr).reduce((s,p)=>s+Number(p.attempted||0),0);
+}
+function studyHoursOn(dateStr){
+  const mins = DATA.studySessions.filter(s=>s.date===dateStr).reduce((s,x)=>s+Number(x.minutes||0),0);
+  return mins/60;
+}
+function rangeDates(days){
+  const arr = [];
+  for(let i=days-1;i>=0;i--) arr.push(addDays(todayStr(), -i));
+  return arr;
+}
+function sumInRange(fn, days){
+  return rangeDates(days).reduce((s,d)=>s+fn(d),0);
+}
+function revisionsDueToday(){
+  return DATA.revisions.filter(r=>!r.completed && r.dueDate===todayStr());
+}
+function revisionsOverdue(){
+  return DATA.revisions.filter(r=>!r.completed && r.dueDate < todayStr());
+}
+function revisionsUpcoming(){
+  return DATA.revisions.filter(r=>!r.completed && r.dueDate > todayStr());
+}
+function revisionStatusOf(r){
+  if(r.completed) return 'Completed';
+  if(r.dueDate < todayStr()) return 'Overdue';
+  if(r.dueDate === todayStr()) return 'Due Today';
+  return 'Upcoming';
+}
+function latestTest(){
+  if(DATA.tests.length===0) return null;
+  return [...DATA.tests].sort((a,b)=> b.date.localeCompare(a.date))[0];
+}
+function testAccuracy(t){
+  const attempted = Number(t.correct||0)+Number(t.wrong||0);
+  return attempted? pct(Number(t.correct||0), attempted) : 0;
+}
+function daysUntil(dateStr){
+  return daysBetween(todayStr(), dateStr);
+}
+
+/* ---------------- Streak engine ---------------- */
+function todayHasStudyActivity(){
+  const minMinutes = Math.max(0, Number(DATA.settings.minStudyMinutesForStreak)||0);
+  const minutesToday = studyHoursOn(todayStr())*60;
+  if(minMinutes<=0) return minutesToday > 0;
+  return minutesToday >= minMinutes;
+}
+function todayHasQuestionActivity(){
+  const minQ = Math.max(0, Number(DATA.settings.minQuestionsForStreak)||0);
+  const qToday = questionsSolvedOn(todayStr());
+  if(minQ<=0) return qToday > 0;
+  return qToday >= minQ;
+}
+function todayHasRevisionActivity(){
+  const minRev = Math.max(0, Number(DATA.settings.minRevisionsForStreak)||0);
+  const count = DATA.revisions.filter(r=> r.completedDate === todayStr()).length;
+  if(minRev<=0) return count > 0;
+  return count >= minRev;
+}
+function bumpStreak(key, activeToday){
+  const s = DATA.streaks[key];
+  if(!activeToday) return;
+  if(s.lastDate === todayStr()) return; // already counted today
+  if(s.lastDate === addDays(todayStr(),-1)){
+    s.current += 1;
+  } else {
+    s.current = 1;
+  }
+  s.lastDate = todayStr();
+  if(s.current > s.longest) s.longest = s.current;
+}
+function recomputeStreaks(){
+  bumpStreak('study', todayHasStudyActivity());
+  bumpStreak('question', todayHasQuestionActivity());
+  bumpStreak('revision', todayHasRevisionActivity());
+  // decay: if last active date is older than yesterday, reset current to 0 for display
+  ['study','question','revision'].forEach(k=>{
+    const s = DATA.streaks[k];
+    if(s.lastDate && s.lastDate < addDays(todayStr(),-1)){
+      s.current = 0;
+    }
+  });
+  saveData();
+}
+/* ============================================================
+   NAVIGATION / THEME / BOOTSTRAP
+   ============================================================ */
+const ICONS = {
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>`,
+  planner: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>`,
+  chapters: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  practice: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
+  tests: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6l1 4H8l1-4z"/><path d="M6 6h12l1 14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1L6 6z"/><path d="M9.5 12.5l1.8 1.8L15 10"/></svg>`,
+  revision: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg>`,
+  analytics: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>`,
+  timer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  target: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>`,
+  flame: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c2 3-2 4-2 8a4 4 0 0 0 8 0c0-1 0-2-1-3 2 1 3 3 3 6a6 6 0 1 1-12 0c0-4 3-6 4-11z"/></svg>`,
+  add_task: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
+};
+
+const NAV_ITEMS = [
+  {id:'home', label:'Home', icon:'home'},
+  {id:'planner', label:'Planner', icon:'planner'},
+  {id:'chapters', label:'Chapters', icon:'chapters'},
+  {id:'practice', label:'Practice', icon:'practice'},
+  {id:'tests', label:'Tests', icon:'tests'},
+  {id:'revision', label:'Revision', icon:'revision'},
+  {id:'timer', label:'Study Timer', icon:'timer'},
+  {id:'analytics', label:'Analytics', icon:'analytics'},
+  {id:'settings', label:'Settings', icon:'settings'},
+];
+const BOTTOM_NAV_IDS = ['home','planner','chapters','tests','analytics'];
+
+let CURRENT_VIEW = 'home';
+
+function buildSidebar(){
+  const nav = $('#sidebarNav');
+  nav.innerHTML = NAV_ITEMS.map(item=>`
+    <button class="nav-item ${item.id===CURRENT_VIEW?'active':''}" data-view="${item.id}">
+      ${ICONS[item.icon]}<span>${item.label}</span>
+    </button>`).join('');
+  $all('.nav-item', nav).forEach(btn=>btn.addEventListener('click', ()=>switchView(btn.dataset.view)));
+}
+function buildBottomNav(){
+  const bn = $('#bottomnav');
+  bn.innerHTML = BOTTOM_NAV_IDS.map(id=>{
+    const item = NAV_ITEMS.find(n=>n.id===id);
+    return `<button class="bn-item ${id===CURRENT_VIEW?'active':''}" data-view="${id}">
+      ${ICONS[item.icon]}<span>${item.label}</span>
+    </button>`;
+  }).join('');
+  $all('.bn-item', bn).forEach(btn=>btn.addEventListener('click', ()=>switchView(btn.dataset.view)));
+}
+function switchView(viewId){
+  CURRENT_VIEW = viewId;
+  $all('.view').forEach(v=>v.classList.remove('active'));
+  const target = $('#view-'+viewId);
+  if(target) target.classList.add('active');
+  const item = NAV_ITEMS.find(n=>n.id===viewId);
+  $('#viewTitle').textContent = item ? item.label : (viewId==='timer'?'Study Timer':'JEE Tracker');
+  $all('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.view===viewId));
+  $all('.bn-item').forEach(b=>b.classList.toggle('active', b.dataset.view===viewId));
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+  renderView(viewId);
+}
+function renderView(viewId){
+  if(viewId==='home') renderHome();
+  else if(viewId==='planner') renderPlanner();
+  else if(viewId==='chapters') renderChapters();
+  else if(viewId==='practice') renderPractice();
+  else if(viewId==='tests') renderTests();
+  else if(viewId==='revision') renderRevision();
+  else if(viewId==='analytics') renderAnalytics();
+  else if(viewId==='settings') renderSettings();
+  else if(viewId==='timer') renderTimer();
+}
+function renderAll(){
+  recomputeStreaks();
+  renderView(CURRENT_VIEW);
+}
+
+function applyTheme(){
+  const theme = DATA.settings.theme || 'light';
+  document.documentElement.setAttribute('data-theme', theme==='dark'?'dark':'light');
+}
+function updateTopDate(){
+  const d = new Date();
+  $('#topDate').textContent = d.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short'});
+}
+
+/* ---------------- Modal helpers ---------------- */
+function openModal(html){
+  $('#modalBody').innerHTML = html;
+  $('#modalBackdrop').classList.add('open');
+}
+function closeModal(){
+  $('#modalBackdrop').classList.remove('open');
+  $('#modalBody').innerHTML = '';
+}
+$('#modalBackdrop').addEventListener('click', e=>{
+  if(e.target.id==='modalBackdrop') closeModal();
+});
+
+/* ---------------- Boot ---------------- */
+function boot(){
+  loadData();
+  applyTheme();
+  buildSidebar();
+  buildBottomNav();
+  updateTopDate();
+  switchView('home');
+  setInterval(()=>{ updateTopDate(); tickCountdowns(); }, 30000);
+  setInterval(()=>{ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }, 1000);
+
+  $('#fabBtn').addEventListener('click', openQuickAddMenu);
+  $('#moreMenuBtn').addEventListener('click', openMoreMenu);
+  $('#importFileInput').addEventListener('change', e=>{
+    const f = e.target.files[0];
+    if(f) importDataFromFile(f);
+    e.target.value = '';
+  });
+}
+function tickCountdowns(){ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }
+
+let DEFERRED_INSTALL_PROMPT = null;
+window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); DEFERRED_INSTALL_PROMPT = e; });
+
+function openMoreMenu(){
+  const extra = ['practice','revision','timer','settings'];
+  const showInstall = !!DEFERRED_INSTALL_PROMPT;
+  openModal(`
+    <div class="modal-head"><h3>More</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="list">
+      ${extra.map(id=>{
+        const item = NAV_ITEMS.find(n=>n.id===id);
+        return `<button class="row-item" style="width:100%; border:1px solid var(--line); cursor:pointer;" data-goto="${id}">
+          <span class="icon-btn" style="pointer-events:none;">${ICONS[item.icon]}</span>
+          <div class="ri-main" style="pointer-events:none;"><div class="ri-title">${item.label}</div></div>
+        </button>`;
+      }).join('')}
+      ${showInstall ? `<button class="row-item" style="width:100%; border:1px solid var(--line); cursor:pointer;" id="installAppBtn">
+          <span class="icon-btn" style="pointer-events:none;">${ICONS.home}</span>
+          <div class="ri-main" style="pointer-events:none;"><div class="ri-title">Install App on Home Screen</div></div>
+        </button>` : ''}
+    </div>
+  `);
+  $all('[data-goto]').forEach(b=>b.addEventListener('click', ()=>{ closeModal(); switchView(b.dataset.goto); }));
+  const installBtn = document.getElementById('installAppBtn');
+  if(installBtn) installBtn.addEventListener('click', async ()=>{
+    closeModal();
+    if(!DEFERRED_INSTALL_PROMPT) return;
+    DEFERRED_INSTALL_PROMPT.prompt();
+    await DEFERRED_INSTALL_PROMPT.userChoice;
+    DEFERRED_INSTALL_PROMPT = null;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', boot);
+/* ============================================================
+   HOME / DASHBOARD
+   ============================================================ */
+function countdownParts(dateStr){
+  const days = daysUntil(dateStr);
+  return days;
+}
+function renderHomeCountdownOnly(){
+  const view = $('#view-home');
+  if(!view.classList.contains('active')) return;
+  const mainDays = countdownParts(DATA.settings.jeeMainDate);
+  const advDays = countdownParts(DATA.settings.jeeAdvancedDate);
+  const mEl = $('#cd-main'); const aEl = $('#cd-adv');
+  if(mEl) mEl.innerHTML = `${mainDays>=0?mainDays:0}<span> days</span>`;
+  if(aEl) aEl.innerHTML = `${advDays>=0?advDays:0}<span> days</span>`;
+}
+
+function renderHome(){
+  const s = DATA.settings;
+  const streaks = DATA.streaks;
+  const todayQ = questionsSolvedOn(todayStr());
+  const todayHrs = studyHoursOn(todayStr());
+  const tTasks = todaysTasks();
+  const doneTasks = tTasks.filter(t=>t.completed).length;
+  const pendingCount = pendingTasksAll().length;
+  const revDue = revisionsDueToday().length;
+  const overall = overallSyllabusPct();
+  const phy = chapterCompletionPct('Physics');
+  const chem = chapterCompletionPct('Chemistry');
+  const math = chapterCompletionPct('Mathematics');
+  const lt = latestTest();
+
+  const html = `
+  <div class="hero">
+    <div class="hero-row">
+      <div class="hero-exam">
+        <div class="label">JEE Main</div>
+        <div class="num" id="cd-main">${Math.max(daysUntil(s.jeeMainDate),0)}<span> days</span></div>
+        <div class="sub">${fmtDate(s.jeeMainDate)}</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-exam">
+        <div class="label">JEE Advanced</div>
+        <div class="num" id="cd-adv">${Math.max(daysUntil(s.jeeAdvancedDate),0)}<span> days</span></div>
+        <div class="sub">${fmtDate(s.jeeAdvancedDate)}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Quick actions</div>
+  <div class="qa-row">
+    <button class="qa-btn" data-qa="session"><span class="qico">${ICONS.timer}</span>Start Session</button>
+    <button class="qa-btn" data-qa="task"><span class="qico">${ICONS.add_task}</span>Add Task</button>
+    <button class="qa-btn" data-qa="practice"><span class="qico">${ICONS.practice}</span>Add Questions</button>
+    <button class="qa-btn" data-qa="test"><span class="qico">${ICONS.tests}</span>Add Test</button>
+    <button class="qa-btn" data-qa="revision"><span class="qico">${ICONS.revision}</span>Mark Revision</button>
+  </div>
+
+  <div class="section-title">Today's target</div>
+  <div class="card">
+    <div class="grid grid-2">
+      <div>
+        <div class="pbar-row"><span>Study hours</span><span>${hoursToHM(todayHrs)} / ${s.dailyStudyHours}h</span></div>
+        <div class="pbar"><div style="width:${pct(todayHrs, s.dailyStudyHours)}%"></div></div>
+      </div>
+      <div>
+        <div class="pbar-row"><span>Questions</span><span>${todayQ} / ${s.dailyQuestionTarget}</span></div>
+        <div class="pbar amber"><div style="width:${pct(todayQ, s.dailyQuestionTarget)}%"></div></div>
+      </div>
+      <div>
+        <div class="pbar-row"><span>Tasks</span><span>${doneTasks} / ${Math.max(s.dailyTaskTarget, tTasks.length)}</span></div>
+        <div class="pbar green"><div style="width:${pct(doneTasks, Math.max(s.dailyTaskTarget,tTasks.length,1))}%"></div></div>
+      </div>
+      <div>
+        <div class="pbar-row"><span>Revision</span><span>${revDue===0?'0':(DATA.revisions.filter(r=>r.dueDate===todayStr()&&r.completed).length)} / ${Math.max(s.dailyRevisionTarget, revDue)}</span></div>
+        <div class="pbar"><div style="width:${pct(DATA.revisions.filter(r=>r.dueDate===todayStr()&&r.completed).length, Math.max(s.dailyRevisionTarget,revDue,1))}%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Today at a glance</div>
+  <div class="grid grid-4">
+    <div class="stat"><div class="icon" style="background:var(--amber-tint); color:var(--amber);">${ICONS.flame}</div><div class="val">${streaks.study.current}</div><div class="lbl">Study streak</div></div>
+    <div class="stat"><div class="icon" style="background:var(--green-tint); color:var(--green);">${ICONS.check}</div><div class="val">${doneTasks}/${tTasks.length}</div><div class="lbl">Tasks done</div></div>
+    <div class="stat"><div class="icon" style="background:var(--indigo-tint); color:var(--indigo);">${ICONS.clock}</div><div class="val">${hoursToHM(todayHrs)}</div><div class="lbl">Studied today</div></div>
+    <div class="stat"><div class="icon" style="background:var(--red-tint); color:var(--red);">${ICONS.revision}</div><div class="val">${revDue}</div><div class="lbl">Revision due</div></div>
+  </div>
+
+  <div class="section-title">Syllabus completion</div>
+  <div class="card">
+    <div class="hbar-row"><div class="hb-label">Overall</div><div class="hb-track"><div style="width:${overall}%; background:var(--indigo);"></div></div><div class="hb-val">${overall}%</div></div>
+    <div class="hbar-row"><div class="hb-label">Physics</div><div class="hb-track"><div style="width:${phy}%; background:#3E6FD9;"></div></div><div class="hb-val">${phy}%</div></div>
+    <div class="hbar-row"><div class="hb-label">Chemistry</div><div class="hb-track"><div style="width:${chem}%; background:var(--green);"></div></div><div class="hb-val">${chem}%</div></div>
+    <div class="hbar-row"><div class="hb-label">Mathematics</div><div class="hb-track"><div style="width:${math}%; background:var(--amber);"></div></div><div class="hb-val">${math}%</div></div>
+  </div>
+
+  <div class="section-title">Pending &amp; upcoming</div>
+  <div class="grid grid-2">
+    <div class="card-flat"><div class="lbl muted">Pending tasks</div><div style="font-size:22px; font-weight:700; margin-top:4px;">${pendingCount}</div></div>
+    <div class="card-flat"><div class="lbl muted">Revision due today</div><div style="font-size:22px; font-weight:700; margin-top:4px;">${revDue}</div></div>
+  </div>
+
+  ${lt ? `
+  <div class="section-title">Latest mock test</div>
+  <div class="card">
+    <div class="ri-title" style="margin-bottom:4px;">${esc(lt.name)} <span class="badge studying">${esc(lt.type)}</span></div>
+    <div class="muted" style="margin-bottom:10px;">${fmtDate(lt.date)}</div>
+    <div class="grid grid-3">
+      <div><div class="lbl muted">Score</div><div style="font-weight:700; font-size:18px;">${lt.total}</div></div>
+      <div><div class="lbl muted">Accuracy</div><div style="font-weight:700; font-size:18px;">${testAccuracy(lt)}%</div></div>
+      <div><div class="lbl muted">Attempted</div><div style="font-weight:700; font-size:18px;">${Number(lt.correct||0)+Number(lt.wrong||0)}</div></div>
+    </div>
+  </div>` : `
+  <div class="section-title">Latest mock test</div>
+  <div class="empty card-flat"><div class="ee">📝</div><h4>No tests added yet</h4><p>Start tracking your first mock test.</p></div>
+  `}
+  `;
+  view('home').innerHTML = html;
+  $all('.qa-btn').forEach(b=>b.addEventListener('click', ()=>handleQuickAction(b.dataset.qa)));
+}
+function view(id){ return $('#view-'+id); }
+
+function handleQuickAction(type){
+  if(type==='session') switchView('timer');
+  else if(type==='task') openTaskModal();
+  else if(type==='practice') openPracticeModal();
+  else if(type==='test') openTestModal();
+  else if(type==='revision') openQuickRevisionModal();
+}
+function openQuickAddMenu(){
+  const map = {
+    home:'task', planner:'task', chapters:'chapter', practice:'practice',
+    tests:'test', revision:'revision-manual', analytics:'task', settings:'task', timer:'task'
+  };
+  const action = map[CURRENT_VIEW] || 'task';
+  if(action==='task') openTaskModal();
+  else if(action==='chapter') openChapterModal();
+  else if(action==='practice') openPracticeModal();
+  else if(action==='test') openTestModal();
+  else if(action==='revision-manual') openQuickRevisionModal();
+}
+function openQuickRevisionModal(){
+  const pending = DATA.revisions.filter(r=>!r.completed);
+  if(pending.length===0){ toast('No pending revisions. Chapters get scheduled after you mark them Completed.'); return; }
+  const options = pending.map(r=>{
+    const ch = DATA.chapters.find(c=>c.id===r.chapterId);
+    return `<option value="${r.id}">${esc(ch?ch.name:'Chapter')} — Rev ${r.round} (${revisionStatusOf(r)})</option>`;
+  }).join('');
+  openModal(`
+    <div class="modal-head"><h3>Mark revision complete</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Select revision</label><select id="qrevSel">${options}</select></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="completeQuickRevision()">Mark Done</button>
+    </div>
+  `);
+}
+function completeQuickRevision(){
+  const id = $('#qrevSel').value;
+  completeRevision(id);
+  closeModal();
+  renderAll();
+}
+/* ============================================================
+   PLANNER
+   ============================================================ */
+let PLANNER_TAB = 'today';
+
+function renderPlanner(){
+  const tabs = [
+    {id:'today', label:"Today"},
+    {id:'tomorrow', label:"Tomorrow"},
+    {id:'week', label:"This Week"},
+    {id:'completed', label:"Completed"},
+    {id:'all', label:"All Tasks"},
+  ];
+  let list;
+  if(PLANNER_TAB==='today') list = DATA.tasks.filter(t=>t.date===todayStr());
+  else if(PLANNER_TAB==='tomorrow') list = DATA.tasks.filter(t=>t.date===addDays(todayStr(),1));
+  else if(PLANNER_TAB==='week'){
+    const start = todayStr(), end = addDays(todayStr(),6);
+    list = DATA.tasks.filter(t=>t.date>=start && t.date<=end);
+  }
+  else if(PLANNER_TAB==='completed') list = DATA.tasks.filter(t=>t.completed);
+  else list = DATA.tasks.slice();
+
+  list = list.slice().sort((a,b)=> (a.date+a.startTime).localeCompare(b.date+b.startTime));
+
+  const html = `
+    <div class="tabs">
+      ${tabs.map(t=>`<div class="tab ${PLANNER_TAB===t.id?'active':''}" data-tab="${t.id}">${t.label}</div>`).join('')}
+    </div>
+    <button class="btn block" style="margin-bottom:14px;" onclick="openTaskModal()">+ Add Study Task</button>
+    <div class="list" id="taskList">
+      ${list.length ? list.map(taskRowHtml).join('') : emptyState('🗓️','No tasks here yet','Add a study task to build your plan.')}
+    </div>
+  `;
+  view('planner').innerHTML = html;
+  $all('.tab', view('planner')).forEach(t=>t.addEventListener('click', ()=>{ PLANNER_TAB=t.dataset.tab; renderPlanner(); }));
+  $all('[data-taskaction]', view('planner')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    const act = b.dataset.taskaction;
+    if(act==='toggle') toggleTask(id);
+    else if(act==='edit') openTaskModal(id);
+    else if(act==='delete') confirmDelete('task', id, 'Delete this task?');
+  }));
+}
+function emptyState(emoji,title,sub){
+  return `<div class="empty"><div class="ee">${emoji}</div><h4>${title}</h4><p>${sub}</p></div>`;
+}
+function taskRowHtml(t){
+  return `
+  <div class="row-item" data-id="${t.id}">
+    <button class="icon-btn" data-taskaction="toggle" style="${t.completed?'background:var(--green-tint); color:var(--green); border-color:var(--green-tint);':''}">${ICONS.check}</button>
+    <div class="ri-main">
+      <div class="ri-title" style="${t.completed?'text-decoration:line-through; color:var(--ink-soft);':''}">${esc(t.title)} <span class="badge ${t.priority.toLowerCase()}">${t.priority}</span></div>
+      <div class="ri-sub">${esc(t.subject||'General')}${t.chapter?' · '+esc(t.chapter):''} · ${fmtDateShort(t.date)}${t.startTime?', '+t.startTime:''}${t.duration?' · '+t.duration+'m':''}</div>
+    </div>
+    <div class="ri-actions">
+      <button class="icon-btn" data-taskaction="edit">${ICONS.edit}</button>
+      <button class="icon-btn" data-taskaction="delete">${ICONS.trash}</button>
+    </div>
+  </div>`;
+}
+function toggleTask(id){
+  updateData(d=>{
+    const t = d.tasks.find(x=>x.id===id);
+    if(t) t.completed = !t.completed;
+  });
+  renderAll();
+  toast('Task updated');
+}
+function openTaskModal(id){
+  const editing = id ? DATA.tasks.find(t=>t.id===id) : null;
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option ${editing&&editing.chapter===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>${editing?'Edit Task':'Add Study Task'}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Task title</label><input id="tf-title" value="${editing?esc(editing.title):''}" placeholder="e.g. Solve Rotational Motion PYQs"></div>
+    <div class="field-row">
+      <div class="field"><label>Subject</label>
+        <select id="tf-subject" onchange="refreshTaskChapterOptions()">
+          <option value="">General</option>
+          <option ${editing&&editing.subject==='Physics'?'selected':''}>Physics</option>
+          <option ${editing&&editing.subject==='Chemistry'?'selected':''}>Chemistry</option>
+          <option ${editing&&editing.subject==='Mathematics'?'selected':''}>Mathematics</option>
+        </select>
+      </div>
+      <div class="field"><label>Chapter / Topic</label>
+        <select id="tf-chapter"><option value="">—</option>${editing?chapterOptions(editing.subject):''}</select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="tf-date" value="${editing?editing.date:todayStr()}"></div>
+      <div class="field"><label>Start time</label><input type="time" id="tf-time" value="${editing?editing.startTime||'':''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Duration (minutes)</label><input type="number" id="tf-duration" min="0" value="${editing?editing.duration||60:60}"></div>
+      <div class="field"><label>Priority</label>
+        <select id="tf-priority">
+          <option ${editing&&editing.priority==='High'?'selected':''}>High</option>
+          <option ${(!editing)||editing.priority==='Medium'?'selected':''}>Medium</option>
+          <option ${editing&&editing.priority==='Low'?'selected':''}>Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveTask('${editing?editing.id:''}')">${editing?'Save Changes':'Add Task'}</button>
+    </div>
+  `);
+  if(editing) refreshTaskChapterOptions();
+}
+function refreshTaskChapterOptions(){
+  const subj = $('#tf-subject').value;
+  const sel = $('#tf-chapter');
+  const current = sel.value;
+  const opts = DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+  sel.innerHTML = `<option value="">—</option>${opts}`;
+  if([...sel.options].some(o=>o.value===current)) sel.value = current;
+}
+function saveTask(id){
+  const title = $('#tf-title').value.trim();
+  if(!title){ toast('Please enter a task title'); return; }
+  const payload = {
+    title,
+    subject: $('#tf-subject').value,
+    chapter: $('#tf-chapter').value,
+    date: $('#tf-date').value || todayStr(),
+    startTime: $('#tf-time').value,
+    duration: Number($('#tf-duration').value)||0,
+    priority: $('#tf-priority').value,
+  };
+  updateData(d=>{
+    if(id){
+      Object.assign(d.tasks.find(t=>t.id===id), payload);
+    } else {
+      d.tasks.push(Object.assign({id:uid(), completed:false}, payload));
+    }
+  });
+  closeModal();
+  renderAll();
+  toast(id?'Task updated':'Task added');
+}
+function confirmDelete(kind, id, msg){
+  openModal(`
+    <div class="modal-head"><h3>Are you sure?</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="font-size:14px; margin-bottom:16px;">${msg}</p>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn danger" onclick="performDelete('${kind}','${id}')">Delete</button>
+    </div>
+  `);
+}
+function performDelete(kind, id){
+  if(kind==='task') deleteData('tasks', id);
+  else if(kind==='chapter') deleteData('chapters', id);
+  else if(kind==='practice') deleteData('practiceSessions', id);
+  else if(kind==='test') deleteData('tests', id);
+  else if(kind==='revision') deleteData('revisions', id);
+  else if(kind==='studySession') deleteData('studySessions', id);
+  closeModal();
+  renderAll();
+  toast('Deleted');
+}
+/* ============================================================
+   CHAPTERS / SYLLABUS TRACKER
+   ============================================================ */
+let CHAPTER_SUBJECT = 'Physics';
+let CHAPTER_FILTER = { status:'', confidence:'', search:'' };
+
+function scheduleRevisionsForChapter(chapterId){
+  const exists = DATA.revisions.some(r=>r.chapterId===chapterId);
+  if(exists) return;
+  const gaps = (DATA.settings.revisionIntervals && DATA.settings.revisionIntervals.length) ? DATA.settings.revisionIntervals : [1,3,7,15];
+  gaps.forEach((gap,i)=>{
+    DATA.revisions.push({
+      id: uid(), chapterId, round: i+1,
+      dueDate: addDays(todayStr(), gap),
+      completed:false, completedDate:null
+    });
+  });
+}
+
+function renderChapters(){
+  const subjects = ['Physics','Chemistry','Mathematics'];
+  const stats = subjectStats(CHAPTER_SUBJECT);
+  const overall = overallSyllabusPct();
+
+  let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
+  if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
+  if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
+  chs = chs.slice().sort((a,b)=>a.order-b.order);
+
+  const html = `
+    <div class="tabs">
+      ${subjects.map(s=>`<div class="tab ${CHAPTER_SUBJECT===s?'active':''}" data-subj="${s}">${s}</div>`).join('')}
+    </div>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="stat"><div class="val">${overall}%</div><div class="lbl">Overall</div></div>
+      <div class="stat"><div class="val">${chapterCompletionPct(CHAPTER_SUBJECT)}%</div><div class="lbl">${CHAPTER_SUBJECT}</div></div>
+      <div class="stat"><div class="val">${stats.completed}</div><div class="lbl">Completed</div></div>
+      <div class="stat"><div class="val" style="color:var(--red);">${stats.weak}</div><div class="lbl">Weak chapters</div></div>
+    </div>
+    <div class="searchbar">
+      <input id="chSearch" placeholder="Search chapters..." value="${esc(CHAPTER_FILTER.search)}">
+    </div>
+    <div class="filter-row">
+      <select id="chStatusFilter">
+        <option value="">All statuses</option>
+        <option ${CHAPTER_FILTER.status==='Not Started'?'selected':''}>Not Started</option>
+        <option ${CHAPTER_FILTER.status==='Studying'?'selected':''}>Studying</option>
+        <option ${CHAPTER_FILTER.status==='Completed'?'selected':''}>Completed</option>
+        <option ${CHAPTER_FILTER.status==='Revised'?'selected':''}>Revised</option>
+      </select>
+      <select id="chConfFilter">
+        <option value="">All confidence</option>
+        <option ${CHAPTER_FILTER.confidence==='Weak'?'selected':''}>Weak</option>
+        <option ${CHAPTER_FILTER.confidence==='Average'?'selected':''}>Average</option>
+        <option ${CHAPTER_FILTER.confidence==='Strong'?'selected':''}>Strong</option>
+      </select>
+      <button class="btn secondary sm" onclick="openChapterModal()">+ Add Chapter</button>
+    </div>
+    <div class="list">
+      ${chs.length ? chs.map(chapterRowHtml).join('') : emptyState('📘','No chapters found','Try a different filter or add a chapter.')}
+    </div>
+  `;
+  view('chapters').innerHTML = html;
+  $all('.tab', view('chapters')).forEach(t=>t.addEventListener('click', ()=>{ CHAPTER_SUBJECT=t.dataset.subj; renderChapters(); }));
+  $('#chSearch').addEventListener('input', e=>{ CHAPTER_FILTER.search=e.target.value; renderChaptersListOnly(); });
+  $('#chStatusFilter').addEventListener('change', e=>{ CHAPTER_FILTER.status=e.target.value; renderChapters(); });
+  $('#chConfFilter').addEventListener('change', e=>{ CHAPTER_FILTER.confidence=e.target.value; renderChapters(); });
+  bindChapterRowEvents();
+}
+function renderChaptersListOnly(){
+  // lightweight re-render keeping focus on search input
+  let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
+  if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
+  if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
+  chs = chs.slice().sort((a,b)=>a.order-b.order);
+  const listEl = view('chapters').querySelector('.list');
+  listEl.innerHTML = chs.length ? chs.map(chapterRowHtml).join('') : emptyState('📘','No chapters found','Try a different filter or add a chapter.');
+  bindChapterRowEvents();
+}
+function chapterRowHtml(c){
+  return `
+  <div class="card" data-id="${c.id}" style="padding:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+      <div class="ri-title">${esc(c.name)}</div>
+      <div class="ri-actions">
+        <button class="icon-btn" data-chaction="delete">${ICONS.trash}</button>
+      </div>
+    </div>
+    <div class="chip-row" style="margin-top:8px;">
+      <select class="chip" data-chfield="status" style="border:none; font-weight:700;">
+        ${['Not Started','Studying','Completed','Revised'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <select class="chip" data-chfield="confidence" style="border:none; font-weight:700;">
+        ${['Weak','Average','Strong'].map(s=>`<option ${c.confidence===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:10px;">
+      <label class="checkline"><input type="checkbox" data-chfield="notesDone" ${c.notesDone?'checked':''}> Notes</label>
+      <label class="checkline"><input type="checkbox" data-chfield="questionsDone" ${c.questionsDone?'checked':''}> Questions</label>
+      <label class="checkline"><input type="checkbox" data-chfield="pyqsDone" ${c.pyqsDone?'checked':''}> PYQs</label>
+    </div>
+  </div>`;
+}
+function bindChapterRowEvents(){
+  $all('[data-chaction="delete"]', view('chapters')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    confirmDelete('chapter', id, 'Delete this chapter and its revision schedule?');
+  }));
+  $all('[data-chfield]', view('chapters')).forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const id = el.closest('[data-id]').dataset.id;
+      const field = el.dataset.chfield;
+      const val = el.type==='checkbox' ? el.checked : el.value;
+      updateData(d=>{
+        const ch = d.chapters.find(c=>c.id===id);
+        ch[field] = val;
+        if(field==='status' && (val==='Completed'||val==='Revised')){
+          scheduleRevisionsForChapter(id);
+        }
+      });
+      renderAll();
+      if(field==='status') toast('Chapter status updated');
+    });
+  });
+}
+function openChapterModal(){
+  openModal(`
+    <div class="modal-head"><h3>Add Chapter</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Subject</label>
+      <select id="nc-subject">
+        <option ${CHAPTER_SUBJECT==='Physics'?'selected':''}>Physics</option>
+        <option ${CHAPTER_SUBJECT==='Chemistry'?'selected':''}>Chemistry</option>
+        <option ${CHAPTER_SUBJECT==='Mathematics'?'selected':''}>Mathematics</option>
+      </select>
+    </div>
+    <div class="field"><label>Chapter name</label><input id="nc-name" placeholder="e.g. Capacitance"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveNewChapter()">Add Chapter</button>
+    </div>
+  `);
+}
+function saveNewChapter(){
+  const name = $('#nc-name').value.trim();
+  if(!name){ toast('Enter a chapter name'); return; }
+  const subject = $('#nc-subject').value;
+  updateData(d=>{
+    const order = d.chapters.filter(c=>c.subject===subject).length;
+    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', order});
+  });
+  CHAPTER_SUBJECT = subject;
+  closeModal();
+  renderAll();
+  toast('Chapter added');
+}
+/* ============================================================
+   QUESTION PRACTICE TRACKER
+   ============================================================ */
+let PRACTICE_FILTER = { subject:'' };
+
+function renderPractice(){
+  const todayQ = questionsSolvedOn(todayStr());
+  const weekQ = sumInRange(questionsSolvedOn, 7);
+  const monthQ = sumInRange(questionsSolvedOn, 30);
+  const totalQ = DATA.practiceSessions.reduce((s,p)=>s+Number(p.attempted||0),0);
+  const target = DATA.settings.dailyQuestionTarget;
+
+  let sessions = DATA.practiceSessions.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(PRACTICE_FILTER.subject) sessions = sessions.filter(p=>p.subject===PRACTICE_FILTER.subject);
+
+  const bySubject = {};
+  DATA.practiceSessions.forEach(p=>{ bySubject[p.subject] = (bySubject[p.subject]||0) + Number(p.attempted||0); });
+  const maxSubj = Math.max(1, ...Object.values(bySubject));
+
+  const html = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="pbar-row"><span>Today's questions</span><span>${todayQ} / ${target}</span></div>
+      <div class="pbar amber"><div style="width:${pct(todayQ,target)}%"></div></div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="stat"><div class="val">${todayQ}</div><div class="lbl">Today</div></div>
+      <div class="stat"><div class="val">${weekQ}</div><div class="lbl">This week</div></div>
+      <div class="stat"><div class="val">${monthQ}</div><div class="lbl">This month</div></div>
+      <div class="stat"><div class="val">${totalQ}</div><div class="lbl">Total solved</div></div>
+    </div>
+    ${Object.keys(bySubject).length ? `
+    <div class="section-title">Subject-wise questions</div>
+    <div class="card" style="margin-bottom:16px;">
+      ${Object.entries(bySubject).map(([subj,n])=>`
+        <div class="hbar-row"><div class="hb-label">${subj}</div><div class="hb-track"><div style="width:${pct(n,maxSubj)}%; background:var(--indigo);"></div></div><div class="hb-val">${n}</div></div>
+      `).join('')}
+    </div>` : ''}
+    <div class="section-title">Practice log
+      <select id="pracSubjFilter" style="width:auto; padding:6px 10px; font-size:12.5px; border-radius:8px; border:1px solid var(--line); background:var(--paper);">
+        <option value="">All subjects</option>
+        <option ${PRACTICE_FILTER.subject==='Physics'?'selected':''}>Physics</option>
+        <option ${PRACTICE_FILTER.subject==='Chemistry'?'selected':''}>Chemistry</option>
+        <option ${PRACTICE_FILTER.subject==='Mathematics'?'selected':''}>Mathematics</option>
+      </select>
+    </div>
+    <button class="btn block" style="margin-bottom:14px;" onclick="openPracticeModal()">+ Log Practice Session</button>
+    <div class="list">
+      ${sessions.length ? sessions.map(practiceRowHtml).join('') : emptyState('✏️','No practice logged yet','Log your first question-practice session.')}
+    </div>
+  `;
+  view('practice').innerHTML = html;
+  $('#pracSubjFilter').addEventListener('change', e=>{ PRACTICE_FILTER.subject=e.target.value; renderPractice(); });
+  $all('[data-pracaction]', view('practice')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    const act = b.dataset.pracaction;
+    if(act==='edit') openPracticeModal(id);
+    else if(act==='delete') confirmDelete('practice', id, 'Delete this practice entry?');
+  }));
+}
+function practiceRowHtml(p){
+  const attempted = Number(p.attempted||0);
+  const correct = Number(p.correct||0), wrong = Number(p.wrong||0);
+  const acc = (correct+wrong) ? pct(correct, correct+wrong) : 0;
+  const perHour = p.timeMinutes ? Math.round(attempted / (p.timeMinutes/60)) : 0;
+  return `
+  <div class="row-item" data-id="${p.id}" style="align-items:flex-start;">
+    <div class="ri-main">
+      <div class="ri-title">${esc(p.subject)}${p.chapter?' · '+esc(p.chapter):''} <span class="badge studying">${acc}% acc</span></div>
+      <div class="ri-sub">${fmtDateShort(p.date)} · ${attempted} attempted · ✓${correct} ✗${wrong} · ${p.timeMinutes||0}m${perHour?' · '+perHour+'/hr':''}</div>
+    </div>
+    <div class="ri-actions">
+      <button class="icon-btn" data-pracaction="edit">${ICONS.edit}</button>
+      <button class="icon-btn" data-pracaction="delete">${ICONS.trash}</button>
+    </div>
+  </div>`;
+}
+function openPracticeModal(id){
+  const editing = id ? DATA.practiceSessions.find(p=>p.id===id) : null;
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option ${editing&&editing.chapter===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>${editing?'Edit Practice Entry':'Log Practice Session'}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="pf-date" value="${editing?editing.date:todayStr()}"></div>
+      <div class="field"><label>Subject</label>
+        <select id="pf-subject" onchange="refreshPracticeChapterOptions()">
+          <option ${!editing||editing.subject==='Physics'?'selected':''}>Physics</option>
+          <option ${editing&&editing.subject==='Chemistry'?'selected':''}>Chemistry</option>
+          <option ${editing&&editing.subject==='Mathematics'?'selected':''}>Mathematics</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Chapter</label><select id="pf-chapter"><option value="">—</option>${chapterOptions(editing?editing.subject:'Physics')}</select></div>
+    <div class="field-row">
+      <div class="field"><label>Attempted</label><input type="number" id="pf-attempted" min="0" value="${editing?editing.attempted:''}"></div>
+      <div class="field"><label>Time spent (min)</label><input type="number" id="pf-time" min="0" value="${editing?editing.timeMinutes:''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Correct</label><input type="number" id="pf-correct" min="0" value="${editing?editing.correct:''}"></div>
+      <div class="field"><label>Wrong</label><input type="number" id="pf-wrong" min="0" value="${editing?editing.wrong:''}"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="savePractice('${editing?editing.id:''}')">${editing?'Save Changes':'Add Entry'}</button>
+    </div>
+  `);
+  refreshPracticeChapterOptions();
+}
+function refreshPracticeChapterOptions(){
+  const subj = $('#pf-subject').value;
+  const sel = $('#pf-chapter');
+  const current = sel.value;
+  sel.innerHTML = `<option value="">—</option>` + DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+  if([...sel.options].some(o=>o.value===current)) sel.value = current;
+}
+function savePractice(id){
+  const attempted = Number($('#pf-attempted').value)||0;
+  const correct = Number($('#pf-correct').value)||0;
+  const wrong = Number($('#pf-wrong').value)||0;
+  if(attempted<=0){ toast('Enter number of questions attempted'); return; }
+  if(correct+wrong > attempted){ toast('Correct + Wrong cannot exceed Attempted'); return; }
+  const payload = {
+    date: $('#pf-date').value || todayStr(),
+    subject: $('#pf-subject').value,
+    chapter: $('#pf-chapter').value,
+    attempted, correct, wrong,
+    unattempted: attempted-correct-wrong,
+    timeMinutes: Number($('#pf-time').value)||0,
+  };
+  updateData(d=>{
+    if(id) Object.assign(d.practiceSessions.find(p=>p.id===id), payload);
+    else d.practiceSessions.push(Object.assign({id:uid()}, payload));
+  });
+  closeModal();
+  renderAll();
+  toast(id?'Entry updated':'Practice logged');
+}
+/* ============================================================
+   MOCK TEST TRACKER
+   ============================================================ */
+let TEST_FILTER = { type:'' };
+
+function renderTests(){
+  let tests = DATA.tests.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(TEST_FILTER.type) tests = tests.filter(t=>t.type===TEST_FILTER.type);
+  const avgScore = DATA.tests.length ? Math.round(DATA.tests.reduce((s,t)=>s+Number(t.total||0),0)/DATA.tests.length) : 0;
+  const avgAcc = DATA.tests.length ? Math.round(DATA.tests.reduce((s,t)=>s+testAccuracy(t),0)/DATA.tests.length) : 0;
+  const best = DATA.tests.length ? Math.max(...DATA.tests.map(t=>Number(t.total||0))) : 0;
+
+  let improvement = '';
+  if(DATA.tests.length>=2){
+    const sorted = [...DATA.tests].sort((a,b)=>a.date.localeCompare(b.date));
+    const prev = sorted[sorted.length-2], last = sorted[sorted.length-1];
+    const diff = Number(last.total||0) - Number(prev.total||0);
+    improvement = `<div class="card-flat" style="margin-bottom:16px;">
+      <div class="lbl muted">Change vs previous test</div>
+      <div style="font-size:20px; font-weight:700; color:${diff>=0?'var(--green)':'var(--red)'};">${diff>=0?'+':''}${diff} marks</div>
+    </div>`;
+  }
+
+  const html = `
+    <div class="grid grid-4" style="margin-bottom:10px;">
+      <div class="stat"><div class="val">${DATA.tests.length}</div><div class="lbl">Tests taken</div></div>
+      <div class="stat"><div class="val">${avgScore}</div><div class="lbl">Average score</div></div>
+      <div class="stat"><div class="val">${avgAcc}%</div><div class="lbl">Average accuracy</div></div>
+      <div class="stat"><div class="val">${best}</div><div class="lbl">Best score</div></div>
+    </div>
+    ${improvement}
+    <div class="section-title">Test history
+      <select id="testTypeFilter" style="width:auto; padding:6px 10px; font-size:12.5px; border-radius:8px; border:1px solid var(--line); background:var(--paper);">
+        <option value="">All types</option>
+        ${['JEE Main','JEE Advanced','Chapter Test','Full Syllabus','Custom'].map(t=>`<option ${TEST_FILTER.type===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+    </div>
+    <button class="btn block" style="margin-bottom:14px;" onclick="openTestModal()">+ Add Mock Test</button>
+    <div class="list">
+      ${tests.length ? tests.map(testRowHtml).join('') : emptyState('📝','No tests added yet','Start tracking your first mock test.')}
+    </div>
+  `;
+  view('tests').innerHTML = html;
+  $('#testTypeFilter').addEventListener('change', e=>{ TEST_FILTER.type=e.target.value; renderTests(); });
+  $all('[data-testaction]', view('tests')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    const act = b.dataset.testaction;
+    if(act==='edit') openTestModal(id);
+    else if(act==='delete') confirmDelete('test', id, 'Delete this test record?');
+    else if(act==='view') viewTestDetails(id);
+  }));
+}
+function testRowHtml(t){
+  return `
+  <div class="row-item" data-id="${t.id}" style="align-items:flex-start; cursor:pointer;">
+    <div class="ri-main" data-testaction="view">
+      <div class="ri-title">${esc(t.name)} <span class="badge studying">${esc(t.type)}</span></div>
+      <div class="ri-sub">${fmtDateShort(t.date)} · Score ${t.total} · ${testAccuracy(t)}% accuracy</div>
+    </div>
+    <div class="ri-actions">
+      <button class="icon-btn" data-testaction="edit">${ICONS.edit}</button>
+      <button class="icon-btn" data-testaction="delete">${ICONS.trash}</button>
+    </div>
+  </div>`;
+}
+function viewTestDetails(id){
+  const t = DATA.tests.find(x=>x.id===id);
+  if(!t) return;
+  openModal(`
+    <div class="modal-head"><h3>${esc(t.name)}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="margin-bottom:14px;">${esc(t.type)} · ${fmtDate(t.date)}</p>
+    <div class="grid grid-3" style="margin-bottom:14px;">
+      <div class="card-flat"><div class="lbl muted">Physics</div><div style="font-weight:700; font-size:17px;">${t.physics||0}</div></div>
+      <div class="card-flat"><div class="lbl muted">Chemistry</div><div style="font-weight:700; font-size:17px;">${t.chemistry||0}</div></div>
+      <div class="card-flat"><div class="lbl muted">Maths</div><div style="font-weight:700; font-size:17px;">${t.maths||0}</div></div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card-flat"><div class="lbl muted">Total marks</div><div style="font-weight:700; font-size:18px;">${t.total}</div></div>
+      <div class="card-flat"><div class="lbl muted">Accuracy</div><div style="font-weight:700; font-size:18px;">${testAccuracy(t)}%</div></div>
+      <div class="card-flat"><div class="lbl muted">Attempted</div><div style="font-weight:700; font-size:18px;">${Number(t.correct||0)+Number(t.wrong||0)}/${t.questions||'—'}</div></div>
+      <div class="card-flat"><div class="lbl muted">Time taken</div><div style="font-weight:700; font-size:18px;">${t.timeTaken||'—'} min</div></div>
+    </div>
+    <div class="modal-actions"><button class="btn block" onclick="closeModal()">Close</button></div>
+  `);
+}
+function openTestModal(id){
+  const editing = id ? DATA.tests.find(t=>t.id===id) : null;
+  openModal(`
+    <div class="modal-head"><h3>${editing?'Edit Test':'Add Mock Test'}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Test name</label><input id="tt-name" value="${editing?esc(editing.name):''}" placeholder="e.g. FIITJEE AITS Full Test 4"></div>
+    <div class="field-row">
+      <div class="field"><label>Test type</label>
+        <select id="tt-type">
+          ${['JEE Main','JEE Advanced','Chapter Test','Full Syllabus','Custom'].map(t=>`<option ${editing&&editing.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="tt-date" value="${editing?editing.date:todayStr()}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Physics marks</label><input type="number" id="tt-physics" value="${editing?editing.physics:''}"></div>
+      <div class="field"><label>Chemistry marks</label><input type="number" id="tt-chemistry" value="${editing?editing.chemistry:''}"></div>
+      <div class="field"><label>Maths marks</label><input type="number" id="tt-maths" value="${editing?editing.maths:''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Questions attempted</label><input type="number" id="tt-questions" value="${editing?editing.questions:''}"></div>
+      <div class="field"><label>Time taken (min)</label><input type="number" id="tt-time" value="${editing?editing.timeTaken:''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Correct</label><input type="number" id="tt-correct" value="${editing?editing.correct:''}"></div>
+      <div class="field"><label>Wrong</label><input type="number" id="tt-wrong" value="${editing?editing.wrong:''}"></div>
+    </div>
+    <p class="muted" style="margin-bottom:12px;">Leave subject marks blank to enter total marks directly.</p>
+    <div class="field"><label>Total marks (auto if subject marks given)</label><input type="number" id="tt-total" value="${editing?editing.total:''}"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveTest('${editing?editing.id:''}')">${editing?'Save Changes':'Add Test'}</button>
+    </div>
+  `);
+}
+function saveTest(id){
+  const name = $('#tt-name').value.trim();
+  if(!name){ toast('Enter a test name'); return; }
+  const physics = $('#tt-physics').value===''?null:Number($('#tt-physics').value);
+  const chemistry = $('#tt-chemistry').value===''?null:Number($('#tt-chemistry').value);
+  const maths = $('#tt-maths').value===''?null:Number($('#tt-maths').value);
+  let total = $('#tt-total').value===''?null:Number($('#tt-total').value);
+  if(physics!==null || chemistry!==null || maths!==null){
+    total = (physics||0)+(chemistry||0)+(maths||0);
+  }
+  if(total===null){ toast('Enter total marks or subject-wise marks'); return; }
+  const payload = {
+    name, type: $('#tt-type').value, date: $('#tt-date').value || todayStr(),
+    physics, chemistry, maths, total,
+    questions: Number($('#tt-questions').value)||0,
+    correct: Number($('#tt-correct').value)||0,
+    wrong: Number($('#tt-wrong').value)||0,
+    timeTaken: Number($('#tt-time').value)||0,
+  };
+  updateData(d=>{
+    if(id) Object.assign(d.tests.find(t=>t.id===id), payload);
+    else d.tests.push(Object.assign({id:uid()}, payload));
+  });
+  closeModal();
+  renderAll();
+  toast(id?'Test updated':'Test added');
+}
+/* ============================================================
+   REVISION TRACKER
+   ============================================================ */
+let REVISION_TAB = 'due';
+
+function completeRevision(revId){
+  updateData(d=>{
+    const r = d.revisions.find(x=>x.id===revId);
+    if(!r) return;
+    r.completed = true;
+    r.completedDate = todayStr();
+    const chapter = d.chapters.find(c=>c.id===r.chapterId);
+    if(chapter){
+      const totalRounds = d.revisions.filter(x=>x.chapterId===r.chapterId).length;
+      chapter.revisionStatus = (r.round>=totalRounds) ? 'Completed' : 'In Progress';
+      chapter.status = 'Revised';
+    }
+  });
+}
+
+function renderRevision(){
+  const due = revisionsDueToday();
+  const overdue = revisionsOverdue();
+  const upcoming = revisionsUpcoming().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const completed = DATA.revisions.filter(r=>r.completed).sort((a,b)=> (b.completedDate||'').localeCompare(a.completedDate||''));
+
+  const tabs = [
+    {id:'due', label:`Due Today (${due.length})`},
+    {id:'overdue', label:`Overdue (${overdue.length})`},
+    {id:'upcoming', label:`Upcoming (${upcoming.length})`},
+    {id:'completed', label:`Completed (${completed.length})`},
+  ];
+  let list;
+  if(REVISION_TAB==='due') list = due;
+  else if(REVISION_TAB==='overdue') list = overdue;
+  else if(REVISION_TAB==='upcoming') list = upcoming;
+  else list = completed;
+
+  const html = `
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="stat"><div class="val" style="color:var(--amber);">${due.length}</div><div class="lbl">Due today</div></div>
+      <div class="stat"><div class="val" style="color:var(--red);">${overdue.length}</div><div class="lbl">Overdue</div></div>
+      <div class="stat"><div class="val" style="color:var(--indigo);">${upcoming.length}</div><div class="lbl">Upcoming</div></div>
+      <div class="stat"><div class="val" style="color:var(--green);">${completed.length}</div><div class="lbl">Completed</div></div>
+    </div>
+    <div class="tabs">
+      ${tabs.map(t=>`<div class="tab ${REVISION_TAB===t.id?'active':''}" data-rtab="${t.id}">${t.label}</div>`).join('')}
+    </div>
+    <button class="btn block" style="margin-bottom:14px;" onclick="openCustomRevisionModal()">+ Add Custom Revision</button>
+    <div class="list">
+      ${list.length ? list.map(revisionRowHtml).join('') : emptyState('🔁','Nothing here','Complete chapters to auto-schedule spaced revisions.')}
+    </div>
+  `;
+  view('revision').innerHTML = html;
+  $all('[data-rtab]', view('revision')).forEach(t=>t.addEventListener('click', ()=>{ REVISION_TAB=t.dataset.rtab; renderRevision(); }));
+  $all('[data-revaction]', view('revision')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    const act = b.dataset.revaction;
+    if(act==='complete'){ completeRevision(id); renderAll(); toast('Revision marked complete'); }
+    else if(act==='edit') openEditRevisionDateModal(id);
+    else if(act==='delete') confirmDelete('revision', id, 'Delete this revision entry?');
+  }));
+}
+function revisionRowHtml(r){
+  const chapter = DATA.chapters.find(c=>c.id===r.chapterId);
+  const status = revisionStatusOf(r);
+  const statusClass = {'Due Today':'duetoday','Overdue':'overdue','Upcoming':'upcoming','Completed':'done'}[status];
+  return `
+  <div class="row-item" data-id="${r.id}">
+    <div class="ri-main">
+      <div class="ri-title">${esc(chapter?chapter.name:'Chapter')} <span class="badge ${statusClass}">${status}</span></div>
+      <div class="ri-sub">${esc(chapter?chapter.subject:'')} · Revision round ${r.round} · ${r.completed? 'Done '+fmtDateShort(r.completedDate) : 'Due '+fmtDateShort(r.dueDate)}</div>
+    </div>
+    <div class="ri-actions">
+      ${!r.completed ? `<button class="icon-btn" data-revaction="complete">${ICONS.check}</button><button class="icon-btn" data-revaction="edit">${ICONS.edit}</button>` : ''}
+      <button class="icon-btn" data-revaction="delete">${ICONS.trash}</button>
+    </div>
+  </div>`;
+}
+function openEditRevisionDateModal(id){
+  const r = DATA.revisions.find(x=>x.id===id);
+  if(!r) return;
+  openModal(`
+    <div class="modal-head"><h3>Reschedule Revision</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>New due date</label><input type="date" id="rf-date" value="${r.dueDate}"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveRevisionDate('${id}')">Save</button>
+    </div>
+  `);
+}
+function saveRevisionDate(id){
+  const newDate = $('#rf-date').value;
+  if(!newDate){ toast('Pick a date'); return; }
+  updateData(d=>{
+    const r = d.revisions.find(x=>x.id===id);
+    if(r) r.dueDate = newDate;
+  });
+  closeModal();
+  renderAll();
+  toast('Revision rescheduled');
+}
+function openCustomRevisionModal(){
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>Add Custom Revision</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Subject</label>
+      <select id="cr-subject" onchange="refreshCustomRevisionChapters()">
+        <option>Physics</option><option>Chemistry</option><option>Mathematics</option>
+      </select>
+    </div>
+    <div class="field"><label>Chapter</label><select id="cr-chapter">${chapterOptions('Physics')}</select></div>
+    <div class="field"><label>Due date</label><input type="date" id="cr-date" value="${addDays(todayStr(),1)}"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveCustomRevision()">Add Revision</button>
+    </div>
+  `);
+  refreshCustomRevisionChapters();
+}
+function refreshCustomRevisionChapters(){
+  const subj = $('#cr-subject').value;
+  $('#cr-chapter').innerHTML = DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+}
+function saveCustomRevision(){
+  const chapterId = $('#cr-chapter').value;
+  const dueDate = $('#cr-date').value;
+  if(!chapterId || !dueDate){ toast('Pick a chapter and date'); return; }
+  updateData(d=>{
+    const existingRounds = d.revisions.filter(r=>r.chapterId===chapterId).length;
+    d.revisions.push({id:uid(), chapterId, round: existingRounds+1, dueDate, completed:false, completedDate:null});
+  });
+  closeModal();
+  renderAll();
+  toast('Custom revision added');
+}
+/* ============================================================
+   ANALYTICS
+   ============================================================ */
+function renderAnalytics(){
+  const days7 = rangeDates(7);
+  const studyHrsSeries = days7.map(d=>studyHoursOn(d));
+  const questSeries = days7.map(d=>questionsSolvedOn(d));
+  const maxHr = Math.max(1, ...studyHrsSeries);
+  const maxQ = Math.max(1, ...questSeries);
+
+  const thisWeekHrs = sumInRange(studyHoursOn,7), prevWeekHrs = sumInRangeOffset(studyHoursOn,7,7);
+  const thisWeekQ = sumInRange(questionsSolvedOn,7), prevWeekQ = sumInRangeOffset(questionsSolvedOn,7,7);
+  const thisWeekTests = DATA.tests.filter(t=>t.date>=addDays(todayStr(),-6)).length;
+  const prevWeekTests = DATA.tests.filter(t=>t.date>=addDays(todayStr(),-13)&&t.date<addDays(todayStr(),-6)).length;
+  const thisWeekAcc = avgAccuracyInRange(0,7), prevWeekAcc = avgAccuracyInRange(7,7);
+
+  const testsSorted = [...DATA.tests].sort((a,b)=>a.date.localeCompare(b.date)).slice(-10);
+  const maxMark = Math.max(1, ...testsSorted.map(t=>Number(t.total||0)));
+
+  const subjPerf = ['Physics','Chemistry','Mathematics'].map(s=>{
+    const rel = DATA.tests.filter(t=>t[s.toLowerCase()==='mathematics'?'maths':s.toLowerCase()]!=null);
+    const avg = rel.length ? Math.round(rel.reduce((sum,t)=>sum+Number(t[s.toLowerCase()==='mathematics'?'maths':s.toLowerCase()]||0),0)/rel.length) : 0;
+    return {subject:s, avg};
+  });
+  const maxSubjPerf = Math.max(1, ...subjPerf.map(s=>s.avg));
+
+  const revConsistency = last8WeeksRevisionRate();
+
+  const html = `
+    <div class="section-title">This week vs previous week</div>
+    <div class="grid grid-4" style="margin-bottom:18px;">
+      ${compareCard('Study Hours', thisWeekHrs, prevWeekHrs, h=>hoursToHM(h))}
+      ${compareCard('Questions', thisWeekQ, prevWeekQ)}
+      ${compareCard('Tests', thisWeekTests, prevWeekTests)}
+      ${compareCard('Accuracy', thisWeekAcc, prevWeekAcc, v=>v+'%')}
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Daily study hours (7 days)</div>
+        <div class="barchart">
+          ${days7.map((d,i)=>`
+            <div class="bcol">
+              <div class="bval">${studyHrsSeries[i]?studyHrsSeries[i].toFixed(1):'0'}</div>
+              <div class="bar" style="height:${pct(studyHrsSeries[i],maxHr)}%; background:var(--indigo);"></div>
+              <div class="blabel">${fmtDateShort(d).split(' ')[0]}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Questions solved (7 days)</div>
+        <div class="barchart">
+          ${days7.map((d,i)=>`
+            <div class="bcol">
+              <div class="bval">${questSeries[i]}</div>
+              <div class="bar" style="height:${pct(questSeries[i],maxQ)}%; background:var(--amber);"></div>
+              <div class="blabel">${fmtDateShort(d).split(' ')[0]}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Mock-test performance</div>
+    ${testsSorted.length ? `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="barchart">
+        ${testsSorted.map(t=>`
+          <div class="bcol">
+            <div class="bval">${t.total}</div>
+            <div class="bar" style="height:${pct(Number(t.total||0),maxMark)}%; background:var(--indigo);"></div>
+            <div class="blabel">${fmtDateShort(t.date).split(' ')[0]}</div>
+          </div>`).join('')}
+      </div>
+      <p class="muted" style="margin-top:6px;">Marks per test, most recent ${testsSorted.length} tests</p>
+    </div>` : emptyState('📈','No test data yet','Add mock tests to see performance trends.')}
+
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Subject performance (avg marks)</div>
+        ${subjPerf.map(s=>`
+          <div class="hbar-row"><div class="hb-label">${s.subject}</div><div class="hb-track"><div style="width:${pct(s.avg,maxSubjPerf)}%; background:var(--indigo);"></div></div><div class="hb-val">${s.avg}</div></div>
+        `).join('')}
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Chapter completion</div>
+        ${['Physics','Chemistry','Mathematics'].map(s=>{
+          const p = chapterCompletionPct(s);
+          return `<div class="hbar-row"><div class="hb-label">${s}</div><div class="hb-track"><div style="width:${p}%; background:var(--green);"></div></div><div class="hb-val">${p}%</div></div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="section-title">Revision consistency (last 8 weeks)</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="barchart">
+        ${revConsistency.map(w=>`
+          <div class="bcol">
+            <div class="bval">${w.count}</div>
+            <div class="bar" style="height:${pct(w.count, Math.max(1,...revConsistency.map(x=>x.count)))}%; background:var(--green);"></div>
+            <div class="blabel">${w.label}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Study time by subject</div>
+        ${subjectStudyTimeBreakdown()}
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Study consistency</div>
+        <div class="grid grid-2">
+          <div class="stat"><div class="val">${DATA.streaks.study.current}</div><div class="lbl">Current streak (days)</div></div>
+          <div class="stat"><div class="val">${DATA.streaks.study.longest}</div><div class="lbl">Longest streak (days)</div></div>
+          <div class="stat"><div class="val">${DATA.studySessions.length}</div><div class="lbl">Total sessions</div></div>
+          <div class="stat"><div class="val">${avgSessionLengthMin()}m</div><div class="lbl">Avg session length</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Weak chapters to focus on</div>
+    <div class="list" style="margin-bottom:16px;">
+      ${weakChaptersList()}
+    </div>
+
+    <div class="section-title">Performance summary</div>
+    <div class="grid grid-4">
+      <div class="stat"><div class="val">${hoursToHM(DATA.studySessions.reduce((s,x)=>s+Number(x.minutes||0),0)/60)}</div><div class="lbl">Total study time</div></div>
+      <div class="stat"><div class="val">${DATA.practiceSessions.reduce((s,p)=>s+Number(p.attempted||0),0)}</div><div class="lbl">Total questions</div></div>
+      <div class="stat"><div class="val">${DATA.tests.length}</div><div class="lbl">Total tests</div></div>
+      <div class="stat"><div class="val">${overallSyllabusPct()}%</div><div class="lbl">Syllabus done</div></div>
+    </div>
+  `;
+  view('analytics').innerHTML = html;
+}
+function subjectStudyTimeBreakdown(){
+  const subjects = ['Physics','Chemistry','Mathematics'];
+  const mins = subjects.map(s=>DATA.studySessions.filter(x=>x.subject===s).reduce((sum,x)=>sum+Number(x.minutes||0),0));
+  const generalMin = DATA.studySessions.filter(x=>!x.subject).reduce((sum,x)=>sum+Number(x.minutes||0),0);
+  const maxMin = Math.max(1, ...mins, generalMin);
+  const colors = {Physics:'var(--indigo)', Chemistry:'var(--amber)', Mathematics:'var(--green)'};
+  let rows = subjects.map((s,i)=>`<div class="hbar-row"><div class="hb-label">${s}</div><div class="hb-track"><div style="width:${pct(mins[i],maxMin)}%; background:${colors[s]};"></div></div><div class="hb-val">${hoursToHM(mins[i]/60)}</div></div>`).join('');
+  if(generalMin>0) rows += `<div class="hbar-row"><div class="hb-label">General</div><div class="hb-track"><div style="width:${pct(generalMin,maxMin)}%; background:var(--slate);"></div></div><div class="hb-val">${hoursToHM(generalMin/60)}</div></div>`;
+  return rows || `<p class="muted">No study sessions logged yet.</p>`;
+}
+function avgSessionLengthMin(){
+  if(!DATA.studySessions.length) return 0;
+  const total = DATA.studySessions.reduce((s,x)=>s+Number(x.minutes||0),0);
+  return Math.round(total/DATA.studySessions.length);
+}
+function weakChaptersList(){
+  const weak = DATA.chapters.filter(c=>c.confidence==='Weak' && c.status!=='Revised');
+  if(!weak.length) return emptyState('💪','No weak chapters flagged','Mark low-confidence chapters as "Weak" to see them here.');
+  return weak.slice(0,8).map(c=>`<div class="row-item"><div class="ri-main"><div class="ri-title">${esc(c.name)}</div><div class="ri-sub">${esc(c.subject)} · ${esc(c.status)}</div></div><span class="badge weak">Weak</span></div>`).join('');
+}
+function sumInRangeOffset(fn, days, offset){
+  const arr = [];
+  for(let i=days-1;i>=0;i--) arr.push(addDays(todayStr(), -(i+offset)));
+  return arr.reduce((s,d)=>s+fn(d),0);
+}
+function avgAccuracyInRange(offset, days){
+  const start = addDays(todayStr(), -(offset+days-1));
+  const end = addDays(todayStr(), -offset);
+  const sessions = DATA.practiceSessions.filter(p=>p.date>=start && p.date<=end);
+  const correct = sessions.reduce((s,p)=>s+Number(p.correct||0),0);
+  const wrong = sessions.reduce((s,p)=>s+Number(p.wrong||0),0);
+  return (correct+wrong) ? pct(correct, correct+wrong) : 0;
+}
+function compareCard(label, cur, prev, fmt){
+  const f = fmt || (v=>v);
+  const diff = cur - prev;
+  const up = diff > 0, flat = diff===0;
+  return `<div class="stat">
+    <div class="val">${f(cur)}</div>
+    <div class="lbl">${label}</div>
+    <div style="font-size:11px; font-weight:700; margin-top:2px; color:${flat?'var(--ink-soft)':(up?'var(--green)':'var(--red)')};">${flat?'No change':(up?'▲ ':'▼ ')+f(Math.abs(diff))+' vs last wk'}</div>
+  </div>`;
+}
+function last8WeeksRevisionRate(){
+  const weeks = [];
+  for(let w=7; w>=0; w--){
+    const start = addDays(todayStr(), -(w*7+6));
+    const end = addDays(todayStr(), -(w*7));
+    const count = DATA.revisions.filter(r=>r.completed && r.completedDate>=start && r.completedDate<=end).length;
+    weeks.push({label:'W'+(8-w), count});
+  }
+  return weeks;
+}
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function renderSettings(){
+  const s = DATA.settings;
+  const html = `
+    <div class="section-title" style="margin-top:0;">Profile</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field"><label>Student name</label><input id="st-name" value="${esc(s.studentName)}" placeholder="Your name"></div>
+      <div class="field"><label>Target exam</label>
+        <select id="st-target">
+          <option ${s.targetExam==='JEE Main + Advanced'?'selected':''}>JEE Main + Advanced</option>
+          <option ${s.targetExam==='JEE Main only'?'selected':''}>JEE Main only</option>
+          <option ${s.targetExam==='JEE Advanced only'?'selected':''}>JEE Advanced only</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>JEE Main exam date</label><input type="date" id="st-mainDate" value="${s.jeeMainDate}"></div>
+        <div class="field"><label>JEE Advanced exam date</label><input type="date" id="st-advDate" value="${s.jeeAdvancedDate}"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Daily targets</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field-row">
+        <div class="field"><label>Daily study hours</label><input type="number" step="0.5" id="st-studyHrs" value="${s.dailyStudyHours}"></div>
+        <div class="field"><label>Daily question target</label><input type="number" id="st-qTarget" value="${s.dailyQuestionTarget}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Daily task target</label><input type="number" id="st-taskTarget" value="${s.dailyTaskTarget}"></div>
+        <div class="field"><label>Daily revision target</label><input type="number" id="st-revTarget" value="${s.dailyRevisionTarget}"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Revision schedule</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Revision intervals (days after completing a chapter, comma-separated)</label>
+        <input id="st-revIntervals" value="${(s.revisionIntervals||[1,3,7,15]).join(', ')}" placeholder="1, 3, 7, 15">
+      </div>
+      <p class="muted">Example: "1, 3, 7, 15" schedules 4 revisions. Change the number of values to change how many rounds get scheduled. Applies to chapters completed after saving.</p>
+    </div>
+
+    <div class="section-title">Streak minimums</div>
+    <div class="card" style="margin-bottom:16px;">
+      <p class="muted" style="margin-bottom:12px;">A day only counts toward a streak once it meets these minimums. Set to 0 to count any activity, however small.</p>
+      <div class="field-row">
+        <div class="field"><label>Min. study minutes / day</label><input type="number" min="0" id="st-minStudy" value="${s.minStudyMinutesForStreak}"></div>
+        <div class="field"><label>Min. questions / day</label><input type="number" min="0" id="st-minQ" value="${s.minQuestionsForStreak}"></div>
+      </div>
+      <div class="field"><label>Min. revisions completed / day</label><input type="number" min="0" id="st-minRev" value="${s.minRevisionsForStreak}"></div>
+    </div>
+
+    <div class="section-title">Study timer</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field-row">
+        <div class="field"><label>Pomodoro duration (min)</label><input type="number" id="st-pomo" value="${s.pomodoroMinutes}"></div>
+        <div class="field"><label>Short break (min)</label><input type="number" id="st-pomoBreak" value="${s.pomodoroBreak}"></div>
+      </div>
+      <div class="field"><label>Long break (min)</label><input type="number" id="st-pomoLong" value="${s.pomodoroLongBreak}"></div>
+    </div>
+
+    <div class="section-title">Appearance</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field"><label>Theme</label>
+        <div class="seg">
+          <button type="button" class="${s.theme==='light'?'active':''}" data-theme="light">Light</button>
+          <button type="button" class="${s.theme==='dark'?'active':''}" data-theme="dark">Dark</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn block" onclick="saveSettings()" style="margin-bottom:22px;">Save Settings</button>
+
+    <div class="section-title">Data backup</div>
+    <div class="card" style="margin-bottom:16px;">
+      <p class="muted" style="margin-bottom:14px;">Your data lives only on this device. Export a backup regularly, especially before clearing browser data.</p>
+      <div class="modal-actions" style="margin-bottom:0;">
+        <button class="btn secondary" onclick="exportData()">Export Data</button>
+        <button class="btn secondary" onclick="document.getElementById('importFileInput').click()">Import Data</button>
+      </div>
+    </div>
+
+    <div class="section-title">Danger zone</div>
+    <div class="card" style="border-color:var(--red);">
+      <p class="muted" style="margin-bottom:14px;">This permanently deletes all tasks, chapters progress, practice logs, tests, and revision history from this device.</p>
+      <button class="btn danger block" onclick="confirmResetAll()">Reset All Data</button>
+    </div>
+  `;
+  view('settings').innerHTML = html;
+  $all('[data-theme]', view('settings')).forEach(b=>b.addEventListener('click', ()=>{
+    $all('[data-theme]', view('settings')).forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    DATA.settings.theme = b.dataset.theme;
+    applyTheme();
+  }));
+}
+function saveSettings(){
+  updateData(d=>{
+    d.settings.studentName = $('#st-name').value.trim();
+    d.settings.targetExam = $('#st-target').value;
+    d.settings.jeeMainDate = $('#st-mainDate').value || d.settings.jeeMainDate;
+    d.settings.jeeAdvancedDate = $('#st-advDate').value || d.settings.jeeAdvancedDate;
+    d.settings.dailyStudyHours = Number($('#st-studyHrs').value)||1;
+    d.settings.dailyQuestionTarget = Number($('#st-qTarget').value)||1;
+    d.settings.dailyTaskTarget = Number($('#st-taskTarget').value)||1;
+    d.settings.dailyRevisionTarget = Number($('#st-revTarget').value)||1;
+    d.settings.pomodoroMinutes = Number($('#st-pomo').value)||25;
+    d.settings.pomodoroBreak = Number($('#st-pomoBreak').value)||5;
+    d.settings.pomodoroLongBreak = Number($('#st-pomoLong').value)||15;
+
+    const parsedIntervals = $('#st-revIntervals').value.split(',')
+      .map(v=>parseInt(v.trim(),10)).filter(n=>Number.isFinite(n) && n>0)
+      .sort((a,b)=>a-b);
+    d.settings.revisionIntervals = parsedIntervals.length ? parsedIntervals : [1,3,7,15];
+
+    d.settings.minStudyMinutesForStreak = Math.max(0, Number($('#st-minStudy').value)||0);
+    d.settings.minQuestionsForStreak = Math.max(0, Number($('#st-minQ').value)||0);
+    d.settings.minRevisionsForStreak = Math.max(0, Number($('#st-minRev').value)||0);
+  });
+  applyTheme();
+  toast('Settings saved');
+  buildSidebar();
+}
+function confirmResetAll(){
+  openModal(`
+    <div class="modal-head"><h3>Reset all data?</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="margin-bottom:16px;">This cannot be undone. Consider exporting a backup first.</p>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn danger" onclick="resetAllData(); closeModal();">Yes, Reset Everything</button>
+    </div>
+  `);
+}
+/* ============================================================
+   STUDY TIMER
+   ============================================================ */
+const TimerState = {
+  mode: 'stopwatch', // stopwatch | pomodoro
+  running:false,
+  phase:'study', // study | break | longbreak
+  pomoCount:0,
+  elapsedSec:0, // stopwatch elapsed, or pomodoro elapsed within current phase
+  intervalId:null,
+  startedAtTotalSec:0, // for pomodoro countdown total
+};
+
+function renderTimer(){
+  const s = DATA.settings;
+  const html = `
+    <div class="seg" style="max-width:320px; margin:0 auto 6px auto;">
+      <button type="button" class="${TimerState.mode==='stopwatch'?'active':''}" onclick="setTimerMode('stopwatch')">Stopwatch</button>
+      <button type="button" class="${TimerState.mode==='pomodoro'?'active':''}" onclick="setTimerMode('pomodoro')">Pomodoro</button>
+    </div>
+    <div class="card" style="max-width:420px; margin:14px auto;">
+      <div class="timer-mode-label">${TimerState.mode==='pomodoro' ? (TimerState.phase==='study'?'Focus session':(TimerState.phase==='longbreak'?'Long break':'Short break')) : 'Free study session'}</div>
+      <div class="timer-display" id="timerDisplay">${renderTimerText()}</div>
+      <div class="timer-controls">
+        ${!TimerState.running ? `<button class="btn" onclick="startTimer()">${TimerState.elapsedSec>0?'Resume':'Start'}</button>` : `<button class="btn secondary" onclick="pauseTimer()">Pause</button>`}
+        <button class="btn danger" onclick="stopTimer()">Stop &amp; Save</button>
+        <button class="btn ghost" onclick="resetTimer()">Reset</button>
+      </div>
+      ${TimerState.mode==='pomodoro' ? `<p class="muted" style="text-align:center; margin-top:14px;">Round ${TimerState.pomoCount+1} · ${s.pomodoroMinutes}m focus / ${s.pomodoroBreak}m break</p>` : ''}
+    </div>
+
+    <button class="btn secondary block" style="margin-bottom:6px;" onclick="openManualSessionModal()">+ Log Study Session Manually</button>
+    <p class="muted" style="text-align:center; margin-bottom:18px;">Already studied offline? Add the time directly without the timer.</p>
+
+    <div class="section-title">Recent study sessions</div>
+    <div class="list">
+      ${DATA.studySessions.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(sessionRowHtml).join('') || emptyState('⏱️','No sessions logged yet','Start a timer or log one manually.')}
+    </div>
+  `;
+  view('timer').innerHTML = html;
+  $all('[data-sessaction="delete"]', view('timer')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    confirmDelete('studySession', id, 'Delete this study session?');
+  }));
+}
+function sessionRowHtml(s){
+  const timeRange = (s.startTime && s.endTime) ? ` · ${s.startTime}–${s.endTime}` : '';
+  return `<div class="row-item" data-id="${s.id}"><div class="ri-main">
+    <div class="ri-title">${esc(s.subject||'Study')}${s.chapter?' · '+esc(s.chapter):''}</div>
+    <div class="ri-sub">${fmtDateShort(s.date)} · ${Math.round(s.minutes)} min${timeRange}</div>
+  </div>
+  <div class="ri-actions"><button class="icon-btn" data-sessaction="delete">${ICONS.trash}</button></div>
+  </div>`;
+}
+function openManualSessionModal(){
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>Log Study Session</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="field"><label>Date</label><input type="date" id="ms-date" value="${todayStr()}"></div>
+    <div class="field-row">
+      <div class="field"><label>Subject</label>
+        <select id="ms-subject" onchange="refreshManualChapterOptions()">
+          <option>Physics</option><option>Chemistry</option><option>Mathematics</option><option value="">General / Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Chapter / Topic</label><select id="ms-chapter"><option value="">—</option>${chapterOptions('Physics')}</select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Started at</label><input type="time" id="ms-start" value="18:00"></div>
+      <div class="field"><label>Ended at</label><input type="time" id="ms-end" value="19:00"></div>
+    </div>
+    <p class="muted" id="ms-duration-preview" style="margin-bottom:6px;"></p>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveManualSession()">Save Session</button>
+    </div>
+  `);
+  refreshManualChapterOptions();
+  const updatePreview = ()=>{
+    const mins = manualSessionMinutes();
+    const el = $('#ms-duration-preview');
+    if(el) el.textContent = mins>0 ? `Duration: ${hoursToHM(mins/60)}` : 'End time must be after start time';
+  };
+  $('#ms-start').addEventListener('input', updatePreview);
+  $('#ms-end').addEventListener('input', updatePreview);
+  updatePreview();
+}
+function manualSessionMinutes(){
+  const start = $('#ms-start').value, end = $('#ms-end').value;
+  if(!start || !end) return 0;
+  const [sh,sm] = start.split(':').map(Number);
+  const [eh,em] = end.split(':').map(Number);
+  let mins = (eh*60+em) - (sh*60+sm);
+  if(mins <= 0) mins += 24*60; // crosses midnight
+  return mins;
+}
+function refreshManualChapterOptions(){
+  const subj = $('#ms-subject').value;
+  $('#ms-chapter').innerHTML = `<option value="">—</option>` + DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+}
+function saveManualSession(){
+  const totalMinutes = manualSessionMinutes();
+  if(totalMinutes<=0){ toast('End time must be after start time'); return; }
+  const date = $('#ms-date').value || todayStr();
+  const subject = $('#ms-subject').value;
+  const chapter = $('#ms-chapter').value;
+  const startTime = $('#ms-start').value;
+  const endTime = $('#ms-end').value;
+  updateData(d=>{
+    d.studySessions.push({id:uid(), date, minutes: totalMinutes, subject, chapter, startTime, endTime});
+  });
+  closeModal();
+  renderAll();
+  toast('Study session logged');
+}
+function setTimerMode(mode){
+  if(TimerState.running) return toast('Stop the current session first');
+  TimerState.mode = mode;
+  TimerState.phase = 'study';
+  TimerState.pomoCount = 0;
+  TimerState.elapsedSec = 0;
+  renderTimer();
+}
+function currentPhaseTotalSec(){
+  const s = DATA.settings;
+  if(TimerState.phase==='study') return s.pomodoroMinutes*60;
+  if(TimerState.phase==='longbreak') return s.pomodoroLongBreak*60;
+  return s.pomodoroBreak*60;
+}
+function renderTimerText(){
+  if(TimerState.mode==='stopwatch') return secToClock(TimerState.elapsedSec);
+  const remaining = Math.max(0, currentPhaseTotalSec() - TimerState.elapsedSec);
+  return secToClock(remaining);
+}
+function startTimer(){
+  if(TimerState.running) return;
+  TimerState.running = true;
+  TimerState.intervalId = setInterval(()=>{
+    TimerState.elapsedSec += 1;
+    if(TimerState.mode==='pomodoro' && TimerState.elapsedSec >= currentPhaseTotalSec()){
+      handlePomodoroPhaseEnd();
+    }
+    const disp = $('#timerDisplay');
+    if(disp) disp.textContent = renderTimerText();
+  },1000);
+  renderTimer();
+}
+function pauseTimer(){
+  TimerState.running = false;
+  clearInterval(TimerState.intervalId);
+  renderTimer();
+}
+function handlePomodoroPhaseEnd(){
+  clearInterval(TimerState.intervalId);
+  TimerState.running = false;
+  if(TimerState.phase==='study'){
+    logStudyMinutesPrompt(DATA.settings.pomodoroMinutes);
+    TimerState.pomoCount += 1;
+    TimerState.phase = (TimerState.pomoCount % 4 === 0) ? 'longbreak' : 'break';
+  } else {
+    TimerState.phase = 'study';
+  }
+  TimerState.elapsedSec = 0;
+  toast(TimerState.phase==='study' ? 'Break over — back to focus!' : 'Focus session complete — take a break');
+  renderTimer();
+}
+function stopTimer(){
+  if(TimerState.elapsedSec < 1){ resetTimer(); return; }
+  const minutes = TimerState.mode==='stopwatch' ? TimerState.elapsedSec/60 : Math.min(TimerState.elapsedSec, currentPhaseTotalSec())/60;
+  clearInterval(TimerState.intervalId);
+  TimerState.running = false;
+  if(TimerState.mode==='pomodoro' && TimerState.phase!=='study'){
+    // break session, don't log study time
+    resetTimer();
+    return;
+  }
+  logStudyMinutesPrompt(minutes);
+  resetTimer();
+}
+function resetTimer(){
+  clearInterval(TimerState.intervalId);
+  TimerState.running = false;
+  TimerState.elapsedSec = 0;
+  TimerState.phase = 'study';
+  TimerState.pomoCount = 0;
+  renderTimer();
+}
+function logStudyMinutesPrompt(minutes){
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>Session complete</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="margin-bottom:14px;">You studied for ${hoursToHM(minutes/60)}. What did you cover?</p>
+    <div class="field"><label>Subject</label>
+      <select id="ss-subject" onchange="refreshSessionChapterOptions()">
+        <option>Physics</option><option>Chemistry</option><option>Mathematics</option><option value="">General / Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Chapter / Topic</label><select id="ss-chapter"><option value="">—</option>${chapterOptions('Physics')}</select></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="discardSession()">Discard</button>
+      <button class="btn" onclick="saveStudySession(${minutes})">Save Session</button>
+    </div>
+  `);
+  refreshSessionChapterOptions();
+}
+function refreshSessionChapterOptions(){
+  const subj = $('#ss-subject').value;
+  $('#ss-chapter').innerHTML = `<option value="">—</option>` + DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option>${esc(c.name)}</option>`).join('');
+}
+function discardSession(){
+  closeModal();
+  renderAll();
+}
+function saveStudySession(minutes){
+  const subject = $('#ss-subject').value;
+  const chapter = $('#ss-chapter').value;
+  updateData(d=>{
+    d.studySessions.push({id:uid(), date:todayStr(), minutes, subject, chapter});
+  });
+  closeModal();
+  renderAll();
+  toast('Study session saved');
+}
+
+</script>
+</body>
+</html>
