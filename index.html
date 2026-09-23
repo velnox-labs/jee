@@ -417,6 +417,48 @@ table.simple td{padding:9px 8px; border-bottom:1px solid var(--line);}
 .streak-flame{display:flex; align-items:center; gap:8px;}
 .streak-flame .num{font-family:var(--font-head); font-size:28px; font-weight:800; color:var(--amber);}
 
+
+/* ---------- Auth screen ---------- */
+.auth-screen{
+  position:fixed; inset:0; z-index:150; background:var(--paper); overflow-y:auto;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px));
+}
+.auth-screen[hidden], .auth-screen [hidden]{display:none !important;}
+.auth-wrap{width:100%; max-width:400px; margin:auto 0;}
+.auth-brand{display:flex; align-items:baseline; gap:8px; margin-bottom:26px;}
+.auth-brand .brand-mark{font-size:26px;}
+.auth-brand .brand-sub{font-size:13px;}
+.auth-wrap h2{font-size:24px; font-weight:700; margin-bottom:6px;}
+.auth-lead{color:var(--ink-soft); font-size:14px; line-height:1.5; margin-bottom:20px;}
+.auth-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow);}
+.auth-card .seg{margin-bottom:18px;}
+.auth-card .seg button{padding:10px 6px; font-size:13.5px;}
+.auth-card .field input{padding:12px 13px; font-size:15px;}
+.pw-row{position:relative;}
+.pw-row input{padding-right:64px;}
+.pw-toggle{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:var(--indigo); font-weight:600; font-size:12.5px;
+  padding:8px; cursor:pointer; border-radius:8px;
+}
+.pw-toggle:focus-visible, .auth-link:focus-visible{outline:2px solid var(--indigo); outline-offset:2px;}
+.auth-msg{display:none; font-size:13px; line-height:1.45; padding:10px 12px; border-radius:10px; margin-bottom:14px;}
+.auth-msg.show{display:block;}
+.auth-msg.error{background:var(--red-tint); color:var(--red);}
+.auth-msg.ok{background:var(--green-tint); color:var(--green);}
+.auth-card .btn{padding:13px 18px; font-size:15px; margin-top:6px;}
+.auth-card .btn[disabled]{opacity:.6; cursor:default;}
+.auth-link{background:none; border:none; color:var(--indigo); font-weight:600; font-size:13px; cursor:pointer; padding:6px 0;}
+.auth-foot{display:flex; justify-content:center; margin-top:10px;}
+.auth-loading{display:flex; align-items:center; justify-content:center; gap:10px; color:var(--ink-soft); font-size:14px; margin:auto;}
+.auth-spinner{width:18px; height:18px; border-radius:50%; border:2.5px solid var(--line); border-top-color:var(--indigo); animation:authspin .8s linear infinite;}
+@keyframes authspin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){ .auth-spinner{animation-duration:2.4s;} }
+.home-greet{margin-bottom:16px;}
+.home-greet h2{font-size:22px; font-weight:700; line-height:1.25;}
+.home-greet p{color:var(--ink-soft); font-size:13.5px; margin-top:3px;}
+.account-email{font-family:var(--font-mono); font-size:13px; word-break:break-all; margin-bottom:14px;}
 @media print{ .sidebar,.bottomnav,.fab{display:none;} }
 </style>
 </head>
@@ -478,16 +520,193 @@ table.simple td{padding:9px 8px; border-bottom:1px solid var(--line);}
   <div class="modal" id="modalBody"></div>
 </div>
 
+<!-- Auth screen -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-loading" id="authLoading"><span class="auth-spinner"></span><span>Loading…</span></div>
+  <div class="auth-wrap" id="authWrap" hidden>
+    <div class="auth-brand"><span class="brand-mark">JEE</span><span class="brand-sub">Tracker</span></div>
+    <h2 id="authTitle">Welcome back</h2>
+    <p class="auth-lead" id="authLead">Log in to see your progress on any device.</p>
+    <div class="auth-card">
+      <div class="seg" role="tablist">
+        <button type="button" class="active" id="tabLogin" role="tab">Log in</button>
+        <button type="button" id="tabSignup" role="tab">Sign up</button>
+      </div>
+      <div class="auth-msg" id="authMsg" role="alert"></div>
+      <form id="authForm" novalidate>
+        <div class="field" id="nameField" hidden><label for="authName">Your name</label><input id="authName" type="text" autocomplete="name" placeholder="e.g. Aarav"></div>
+        <div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required></div>
+        <div class="field">
+          <label for="authPass">Password</label>
+          <div class="pw-row">
+            <input id="authPass" type="password" autocomplete="current-password" placeholder="At least 6 characters" required>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn block" id="authSubmit">Log in</button>
+      </form>
+      <div class="auth-foot" id="forgotRow"><button type="button" class="auth-link" id="forgotBtn">Forgot password?</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<input type="file" id="importFileInput" accept="application/json" style="display:none;">
 
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
+/* ===== FIREBASE CONFIG ===== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDeqgWmnjwLzgBtUxJEQ2nm4-RFjr5CVx4",
+  authDomain: "jee-tracker-27722.firebaseapp.com",
+  projectId: "jee-tracker-27722",
+  storageBucket: "jee-tracker-27722.firebasestorage.app",
+  messagingSenderId: "1053298189603",
+  appId: "1:1053298189603:web:c0183fc01b6091953b5896"
+};
+const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PASTE_'));
+let fbAuth=null, fbDb=null, fbUid=null, fbReady=false, fbUser=null;
+
+function initFirebase(){
+  if(!FIREBASE_ENABLED) return false;
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    fbAuth = firebase.auth();
+    fbDb = firebase.firestore();
+    fbDb.enablePersistence().catch(()=>{}); // offline cache, ignore if unsupported/multi-tab
+    return true;
+  }catch(e){ console.error('Firebase init failed', e); return false; }
+}
+/* Returns the saved document, null if this user has none yet, or undefined if the read failed. */
+async function fbLoad(){
+  if(!fbUid) return undefined;
+  try{
+    const snap = await fbDb.collection('users').doc(fbUid).get();
+    return snap.exists ? snap.data() : null;
+  }catch(e){ console.error('Firestore load failed', e); return undefined; }
+}
+function fbSave(){
+  if(!fbReady || !DATA) return;
+  fbDb.collection('users').doc(fbUid).set(DATA).catch(e=>console.error('Firestore save failed', e));
+}
+
+/* ---------------- Auth (email + password) ---------------- */
+let authMode = 'login';   // 'login' | 'signup'
+let pendingName = '';
+
+const AUTH_ERRORS = {
+  'auth/invalid-email': 'That email address doesn’t look right. Check it and try again.',
+  'auth/missing-email': 'Enter your email address.',
+  'auth/missing-password': 'Enter your password.',
+  'auth/user-not-found': 'No account found with this email. Sign up to create one.',
+  'auth/wrong-password': 'Wrong password. Try again or reset it.',
+  'auth/invalid-credential': 'Email or password is incorrect.',
+  'auth/invalid-login-credentials': 'Email or password is incorrect.',
+  'auth/email-already-in-use': 'This email already has an account. Log in instead.',
+  'auth/weak-password': 'Password is too short. Use at least 6 characters.',
+  'auth/too-many-requests': 'Too many attempts. Wait a few minutes, or reset your password.',
+  'auth/network-request-failed': 'No internet connection. Check your network and try again.',
+  'auth/user-disabled': 'This account has been disabled.',
+  'auth/operation-not-allowed': 'Email sign-in is turned off. Enable Email/Password under Authentication → Sign-in method in the Firebase console.',
+  'auth/unauthorized-domain': 'This site’s domain isn’t authorised. Add it under Authentication → Settings → Authorized domains in the Firebase console.',
+  'auth/operation-not-supported-in-this-environment': 'Login needs the app to be opened from a website (http/https), not as a local file.'
+};
+function authMsg(text, type){
+  const el = document.getElementById('authMsg');
+  el.textContent = text || '';
+  el.className = 'auth-msg' + (text ? ' show ' + (type||'error') : '');
+}
+function setAuthMode(mode){
+  authMode = mode;
+  const signup = mode==='signup';
+  document.getElementById('tabLogin').classList.toggle('active', !signup);
+  document.getElementById('tabSignup').classList.toggle('active', signup);
+  document.getElementById('authTitle').textContent = signup ? 'Create your account' : 'Welcome back';
+  document.getElementById('authLead').textContent = signup
+    ? 'Your syllabus, tests and streaks stay saved to your account.'
+    : 'Log in to see your progress on any device.';
+  document.getElementById('nameField').hidden = !signup;
+  document.getElementById('forgotRow').hidden = signup;
+  document.getElementById('authSubmit').textContent = signup ? 'Create account' : 'Log in';
+  document.getElementById('authPass').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  authMsg('');
+}
+function showAuthScreen(){
+  document.getElementById('authScreen').hidden = false;
+  document.getElementById('authLoading').hidden = true;
+  document.getElementById('authWrap').hidden = false;
+}
+function hideAuthScreen(){
+  document.getElementById('authScreen').hidden = true;
+}
+function showAuthLoading(msg){
+  document.getElementById('authScreen').hidden = false;
+  document.getElementById('authWrap').hidden = true;
+  const l = document.getElementById('authLoading');
+  l.hidden = false;
+  l.querySelector('span:last-child').textContent = msg || 'Loading…';
+}
+async function submitAuth(e){
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+  if(!email){ authMsg(AUTH_ERRORS['auth/missing-email']); return; }
+  if(!pass){ authMsg(AUTH_ERRORS['auth/missing-password']); return; }
+  const btn = document.getElementById('authSubmit');
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = authMode==='signup' ? 'Creating account…' : 'Logging in…';
+  authMsg('');
+  try{
+    if(authMode==='signup'){
+      pendingName = document.getElementById('authName').value.trim();
+      await fbAuth.createUserWithEmailAndPassword(email, pass);
+    } else {
+      await fbAuth.signInWithEmailAndPassword(email, pass);
+    }
+    // onAuthStateChanged takes it from here
+  }catch(err){
+    console.error('Auth error', err);
+    authMsg(AUTH_ERRORS[err.code] || 'Something went wrong. Please try again.');
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+async function forgotPassword(){
+  const email = document.getElementById('authEmail').value.trim();
+  if(!email){ authMsg('Enter your email above first, then tap “Forgot password?”.'); return; }
+  try{
+    await fbAuth.sendPasswordResetEmail(email);
+    authMsg('Reset link sent to ' + email + '. Check your inbox and spam folder.', 'ok');
+  }catch(err){
+    authMsg(AUTH_ERRORS[err.code] || 'Could not send the reset email. Please try again.');
+  }
+}
+function logout(){
+  if(!fbAuth){ return; }
+  fbAuth.signOut().then(()=>location.reload());
+}
+function initAuthUI(){
+  document.getElementById('tabLogin').addEventListener('click', ()=>setAuthMode('login'));
+  document.getElementById('tabSignup').addEventListener('click', ()=>setAuthMode('signup'));
+  document.getElementById('authForm').addEventListener('submit', submitAuth);
+  document.getElementById('forgotBtn').addEventListener('click', forgotPassword);
+  document.getElementById('pwToggle').addEventListener('click', ()=>{
+    const inp = document.getElementById('authPass');
+    const show = inp.type==='password';
+    inp.type = show ? 'text' : 'password';
+    const b = document.getElementById('pwToggle');
+    b.textContent = show ? 'Hide' : 'Show';
+    b.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+}
+
 /* ============================================================
    JEE TRACKER — core state, storage, utilities
    ============================================================ */
-const LS_KEY = 'jeeTrackerData_v1';
+const LEGACY_LS_KEY = 'jeeTrackerData_v1';   // old single-user key
+let LS_KEY = LEGACY_LS_KEY;                   // becomes jeeTrackerData_v1_<uid> after login
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
 const todayStr = () => new Date().toISOString().slice(0,10);
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -654,6 +873,7 @@ function saveData(){
     console.error('Save failed', e);
     toast('Storage full — could not save.');
   }
+  fbSave(); // no-op automatically if Firebase isn't configured
 }
 function updateData(mutatorFn){
   mutatorFn(DATA);
@@ -662,37 +882,6 @@ function updateData(mutatorFn){
 function deleteData(collection, id){
   DATA[collection] = DATA[collection].filter(x=>x.id!==id);
   saveData();
-}
-function exportData(){
-  const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `jee-tracker-backup-${todayStr()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast('Backup downloaded');
-}
-function importDataFromFile(file){
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(!parsed || typeof parsed !== 'object') throw new Error('bad file');
-      DATA = Object.assign(defaultData(), parsed);
-      DATA.settings = Object.assign(defaultData().settings, parsed.settings||{});
-      DATA.streaks = Object.assign(defaultData().streaks, parsed.streaks||{});
-      saveData();
-      applyTheme();
-      renderAll();
-      toast('Data restored from backup');
-    }catch(err){
-      toast('Import failed — invalid file');
-    }
-  };
-  reader.readAsText(file);
 }
 function resetAllData(){
   DATA = defaultData();
@@ -918,6 +1107,7 @@ function renderAll(){
 function applyTheme(){
   const theme = DATA.settings.theme || 'light';
   document.documentElement.setAttribute('data-theme', theme==='dark'?'dark':'light');
+  try{ localStorage.setItem('jeeTrackerTheme', theme==='dark'?'dark':'light'); }catch(e){}
 }
 function updateTopDate(){
   const d = new Date();
@@ -938,8 +1128,48 @@ $('#modalBackdrop').addEventListener('click', e=>{
 });
 
 /* ---------------- Boot ---------------- */
-function boot(){
-  loadData();
+let APP_STARTED = false;
+
+function mergeCloud(cloud){
+  DATA = Object.assign(defaultData(), cloud);
+  DATA.settings = Object.assign(defaultData().settings, cloud.settings||{});
+  DATA.streaks = Object.assign(defaultData().streaks, cloud.streaks||{});
+  if(!DATA.chapters || DATA.chapters.length===0) DATA.chapters = defaultData().chapters;
+}
+
+/* Runs once a user is logged in (or immediately if Firebase isn't configured). */
+async function startSession(user){
+  if(APP_STARTED) return;
+  APP_STARTED = true;
+
+  if(user){
+    fbUser = user; fbUid = user.uid; fbReady = false;   // stays false until the cloud copy has been read
+    LS_KEY = LEGACY_LS_KEY + '_' + user.uid;   // each account gets its own local cache
+  }
+
+  const hadLocal = !!localStorage.getItem(LS_KEY);
+  loadData();                                   // instant local load
+
+  if(user){
+    const cloud = await fbLoad();
+    if(cloud){
+      mergeCloud(cloud);
+      saveDataLocalOnly();
+    } else if(cloud === null){
+      // brand-new account: bring over data from before logins existed (first account on this device only)
+      const legacy = !hadLocal ? localStorage.getItem(LEGACY_LS_KEY) : null;
+      if(legacy){
+        try{ mergeCloud(JSON.parse(legacy)); localStorage.removeItem(LEGACY_LS_KEY); }catch(e){}
+      }
+      if(pendingName && !DATA.settings.studentName) DATA.settings.studentName = pendingName;
+      saveDataLocalOnly();
+      fbReady = true; fbSave();                 // create this user's cloud document
+    }
+    // cloud === undefined: read failed (offline) → keep local data for now
+    fbReady = true;                             // from here on, every change syncs
+  }
+
+  hideAuthScreen();
   applyTheme();
   buildSidebar();
   buildBottomNav();
@@ -950,10 +1180,32 @@ function boot(){
 
   $('#fabBtn').addEventListener('click', openQuickAddMenu);
   $('#moreMenuBtn').addEventListener('click', openMoreMenu);
-  $('#importFileInput').addEventListener('change', e=>{
-    const f = e.target.files[0];
-    if(f) importDataFromFile(f);
-    e.target.value = '';
+}
+function saveDataLocalOnly(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(DATA)); }catch(e){ console.error('Save failed', e); }
+}
+
+function boot(){
+  try{
+    const t = localStorage.getItem('jeeTrackerTheme');
+    if(t) document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+  initAuthUI();
+
+  if(!FIREBASE_ENABLED || !initFirebase()){
+    // no Firebase → old offline-only behaviour, no login
+    startSession(null);
+    return;
+  }
+  showAuthLoading('Loading…');
+  fbAuth.onAuthStateChanged(user=>{
+    if(user){
+      showAuthLoading('Loading your data…');
+      startSession(user);
+    } else if(!APP_STARTED){
+      showAuthScreen();
+      setAuthMode('login');
+    }
   });
 }
 function tickCountdowns(){ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }
@@ -1024,7 +1276,15 @@ function renderHome(){
   const math = chapterCompletionPct('Mathematics');
   const lt = latestTest();
 
+  const hr = new Date().getHours();
+  const hello = hr<12 ? 'Good morning' : hr<17 ? 'Good afternoon' : 'Good evening';
+  const who = (s.studentName || '').trim() || ((fbUser && fbUser.email) ? fbUser.email.split('@')[0] : '');
+
   const html = `
+  <div class="home-greet">
+    <h2>${hello}${who ? ', ' + esc(who) : ''}</h2>
+    <p>Let's make today count.</p>
+  </div>
   <div class="hero">
     <div class="hero-row">
       <div class="hero-exam">
@@ -2162,7 +2422,14 @@ function last8WeeksRevisionRate(){
 function renderSettings(){
   const s = DATA.settings;
   const html = `
-    <div class="section-title" style="margin-top:0;">Profile</div>
+    ${fbUser ? `
+    <div class="section-title" style="margin-top:0;">Account</div>
+    <div class="card" style="margin-bottom:16px;">
+      <p class="muted" style="margin-bottom:6px;">Logged in as</p>
+      <div class="account-email">${esc(fbUser.email||'')}</div>
+      <button class="btn secondary block" onclick="logout()">Log out</button>
+    </div>` : ''}
+    <div class="section-title"${fbUser ? '' : ' style="margin-top:0;"'}>Profile</div>
     <div class="card" style="margin-bottom:16px;">
       <div class="field"><label>Student name</label><input id="st-name" value="${esc(s.studentName)}" placeholder="Your name"></div>
       <div class="field"><label>Target exam</label>
@@ -2230,18 +2497,9 @@ function renderSettings(){
 
     <button class="btn block" onclick="saveSettings()" style="margin-bottom:22px;">Save Settings</button>
 
-    <div class="section-title">Data backup</div>
-    <div class="card" style="margin-bottom:16px;">
-      <p class="muted" style="margin-bottom:14px;">Your data lives only on this device. Export a backup regularly, especially before clearing browser data.</p>
-      <div class="modal-actions" style="margin-bottom:0;">
-        <button class="btn secondary" onclick="exportData()">Export Data</button>
-        <button class="btn secondary" onclick="document.getElementById('importFileInput').click()">Import Data</button>
-      </div>
-    </div>
-
     <div class="section-title">Danger zone</div>
     <div class="card" style="border-color:var(--red);">
-      <p class="muted" style="margin-bottom:14px;">This permanently deletes all tasks, chapters progress, practice logs, tests, and revision history from this device.</p>
+      <p class="muted" style="margin-bottom:14px;">This permanently deletes all tasks, chapters progress, practice logs, tests, and revision history from ${fbUser ? 'your account' : 'this device'}.</p>
       <button class="btn danger block" onclick="confirmResetAll()">Reset All Data</button>
     </div>
   `;
@@ -2283,7 +2541,7 @@ function saveSettings(){
 function confirmResetAll(){
   openModal(`
     <div class="modal-head"><h3>Reset all data?</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
-    <p class="muted" style="margin-bottom:16px;">This cannot be undone. Consider exporting a backup first.</p>
+    <p class="muted" style="margin-bottom:16px;">This cannot be undone.</p>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
       <button class="btn danger" onclick="resetAllData(); closeModal();">Yes, Reset Everything</button>
