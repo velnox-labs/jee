@@ -928,6 +928,7 @@ function defaultData(){
       goal: null   // {type, value, dream}
     },
     tasks:[],
+    recurringTasks:[],
     chapters,
     practiceSessions:[],
     tests:[],
@@ -1447,6 +1448,15 @@ const NAV_ITEMS = [
 const BOTTOM_NAV_IDS = ['home','planner','chapters','tests','analytics'];
 
 let CURRENT_VIEW = 'home';
+let APP_TODAY = todayStr();
+function checkDateRollover(){
+  const t = todayStr();
+  if(t !== APP_TODAY){
+    APP_TODAY = t;
+    ensureRecurringTasksForToday();
+    renderAll();
+  }
+}
 
 function buildSidebar(){
   const nav = $('#sidebarNav');
@@ -1612,11 +1622,12 @@ async function startSession(user){
 
   hideAuthScreen();
   applyTheme();
+  ensureRecurringTasksForToday();
   buildSidebar();
   buildBottomNav();
   updateTopDate();
   switchView('home');
-  setInterval(()=>{ updateTopDate(); tickCountdowns(); }, 30000);
+  setInterval(()=>{ updateTopDate(); tickCountdowns(); checkDateRollover(); }, 30000);
   setInterval(()=>{ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }, 1000);
 
   $('#fabBtn').addEventListener('click', openQuickAddMenu);
@@ -1655,6 +1666,8 @@ function tickCountdowns(){ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); 
 
 let DEFERRED_INSTALL_PROMPT = null;
 window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); DEFERRED_INSTALL_PROMPT = e; });
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkDateRollover(); });
+window.addEventListener('focus', checkDateRollover);
 
 function openMoreMenu(){
   const extra = ['goal','practice','revision','timer','settings'];
@@ -1911,7 +1924,7 @@ function taskRowHtml(t){
   <div class="row-item" data-id="${t.id}">
     <button class="icon-btn" data-taskaction="toggle" style="${t.completed?'background:var(--green-tint); color:var(--green); border-color:var(--green-tint);':''}">${ICONS.check}</button>
     <div class="ri-main">
-      <div class="ri-title" style="${t.completed?'text-decoration:line-through; color:var(--ink-soft);':''}">${esc(t.title)} <span class="badge ${t.priority.toLowerCase()}">${t.priority}</span></div>
+      <div class="ri-title" style="${t.completed?'text-decoration:line-through; color:var(--ink-soft);':''}">${t.recurringId?'🔁 ':''}${esc(t.title)} <span class="badge ${t.priority.toLowerCase()}">${t.priority}</span></div>
       <div class="ri-sub">${esc(t.subject||'General')}${t.chapter?' · '+esc(t.chapter):''} · ${fmtDateShort(t.date)}${t.startTime?', '+t.startTime:''}${t.duration?' · '+t.duration+'m':''}</div>
     </div>
     <div class="ri-actions">
@@ -1919,6 +1932,20 @@ function taskRowHtml(t){
       <button class="icon-btn" data-taskaction="delete">${ICONS.trash}</button>
     </div>
   </div>`;
+}
+function ensureRecurringTasksForToday(){
+  if(!DATA.recurringTasks || !DATA.recurringTasks.length) return;
+  const t = todayStr();
+  let changed = false;
+  DATA.recurringTasks.forEach(rt=>{
+    if(!rt.active) return;
+    const exists = DATA.tasks.some(x=>x.recurringId===rt.id && x.date===t);
+    if(!exists){
+      DATA.tasks.push({id:uid(), title:rt.title, subject:rt.subject, chapter:rt.chapter, date:t, startTime:rt.startTime, duration:rt.duration, priority:rt.priority, completed:false, recurringId:rt.id});
+      changed = true;
+    }
+  });
+  if(changed) saveData();
 }
 function toggleTask(id){
   updateData(d=>{
@@ -1961,12 +1988,28 @@ function openTaskModal(id){
         </select>
       </div>
     </div>
+    ${!editing ? `
+    <label class="checkline" style="margin-bottom:14px;">
+      <input type="checkbox" id="tf-repeat"> Repeat this task every day
+    </label>` : editing.recurringId ? `
+    <p class="muted" style="margin-bottom:14px; font-size:13px;">🔁 This task repeats daily. <a href="#" id="tf-stop-repeat" style="color:var(--red);">Stop repeating</a></p>
+    ` : ''}
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
       <button class="btn" onclick="saveTask('${editing?editing.id:''}')">${editing?'Save Changes':'Add Task'}</button>
     </div>
   `);
   if(editing) refreshTaskChapterOptions();
+  const stopBtn = document.getElementById('tf-stop-repeat');
+  if(stopBtn) stopBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    updateData(d=>{
+      const rt = d.recurringTasks.find(r=>r.id===editing.recurringId);
+      if(rt) rt.active = false;
+    });
+    toast('This task will no longer repeat');
+    closeModal();
+  });
 }
 function refreshTaskChapterOptions(){
   const subj = $('#tf-subject').value;
@@ -1992,7 +2035,14 @@ function saveTask(id){
     if(id){
       Object.assign(d.tasks.find(t=>t.id===id), payload);
     } else {
-      d.tasks.push(Object.assign({id:uid(), completed:false}, payload));
+      const newTask = Object.assign({id:uid(), completed:false}, payload);
+      const repeatEl = document.getElementById('tf-repeat');
+      if(repeatEl && repeatEl.checked){
+        const rt = {id:uid(), title:payload.title, subject:payload.subject, chapter:payload.chapter, startTime:payload.startTime, duration:payload.duration, priority:payload.priority, active:true};
+        d.recurringTasks.push(rt);
+        newTask.recurringId = rt.id;
+      }
+      d.tasks.push(newTask);
     }
   });
   closeModal();
