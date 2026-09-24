@@ -331,6 +331,37 @@ button.streak-chip:focus-visible{outline:2px solid var(--indigo); outline-offset
 
 .searchbar{display:flex; gap:8px; margin-bottom:12px;}
 .searchbar input{flex:1;}
+
+.pill-searchbar{
+  display:flex; align-items:center; gap:8px; margin-bottom:12px;
+  background:var(--card); border:1px solid var(--line); border-radius:24px;
+  padding:10px 16px; box-shadow:var(--shadow);
+}
+.pill-searchbar .ps-ico{display:flex; color:var(--ink-soft); flex:0 0 auto;}
+.pill-searchbar .ps-ico svg{width:16px; height:16px;}
+.pill-searchbar input{flex:1; border:none; outline:none; background:transparent; font-size:14px; color:var(--ink); padding:0;}
+.pill-searchbar:focus-within{border-color:var(--indigo);}
+.pill-searchbar .ps-clear{
+  flex:0 0 auto; border:none; background:var(--paper-2); color:var(--ink-soft); width:20px; height:20px;
+  border-radius:50%; font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+
+.filter-row select.pill-select{
+  appearance:none; -webkit-appearance:none;
+  flex:0 0 auto; min-width:0; padding:8px 30px 8px 15px; border-radius:20px;
+  background:var(--paper-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235B6178" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 10px center/12px;
+  border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer;
+}
+.filter-row select.pill-select.active{background-color:var(--indigo-tint); border-color:var(--indigo); color:var(--indigo);}
+.filter-row .pill-toggle{
+  flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
+  background:var(--paper-2); border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer;
+}
+.filter-row .pill-toggle svg{width:14px; height:14px;}
+.filter-row .pill-toggle.active{background:var(--amber-tint); border-color:var(--amber); color:var(--amber);}
+
+.star-mark{color:var(--amber);}
+.card.is-important{border:1px solid var(--amber);}
 .filter-row{display:flex; gap:8px; overflow-x:auto; margin-bottom:12px;}
 .filter-row select{flex:0 0 auto; min-width:120px;}
 
@@ -977,6 +1008,16 @@ function chapterCompletionPct(subject){
 function overallSyllabusPct(){
   return chapterCompletionPct(null);
 }
+function importantSyllabusPct(){
+  const chs = DATA.chapters.filter(c=>c.important);
+  if(chs.length===0) return 0;
+  const doneWeight = chs.reduce((sum,c)=>{
+    if(c.status==='Completed' || c.status==='Revised') return sum+1;
+    if(c.status==='Studying') return sum+0.5;
+    return sum;
+  },0);
+  return pct(doneWeight, chs.length);
+}
 function subjectStats(subject){
   const chs = DATA.chapters.filter(c=>c.subject===subject);
   return {
@@ -1272,6 +1313,7 @@ function goalAnalyticsExtraHtml(){
   <div class="card">
     <div class="grid grid-2">
       <div><div class="pbar-row"><span>Overall syllabus</span><span>${overall}%</span></div><div class="pbar"><div style="width:${overall}%"></div></div></div>
+      <div><div class="pbar-row"><span>★ Important syllabus</span><span>${importantSyllabusPct()}%</span></div><div class="pbar amber"><div style="width:${importantSyllabusPct()}%"></div></div></div>
       <div><div class="pbar-row"><span>Physics</span><span>${phy}%</span></div><div class="pbar"><div style="width:${phy}%; background:${PLAN_COLORS.Physics};"></div></div></div>
       <div><div class="pbar-row"><span>Chemistry</span><span>${chem}%</span></div><div class="pbar green"><div style="width:${chem}%"></div></div></div>
       <div><div class="pbar-row"><span>Mathematics</span><span>${math}%</span></div><div class="pbar amber"><div style="width:${math}%"></div></div></div>
@@ -1377,6 +1419,8 @@ const ICONS = {
   settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>`,
   timer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>`,
   goal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2.5 15.2 9 22.3 10 17.1 15 18.4 22 12 18.6 5.6 22 6.9 15 1.7 10 8.8 9 12 2.5"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
   plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
   edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
   trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/></svg>`,
@@ -1737,6 +1781,7 @@ function renderHome(){
     <div class="stat"><div class="icon" style="background:var(--green-tint); color:var(--green);">${ICONS.check}</div><div class="val">${doneTasks}/${tTasks.length}</div><div class="lbl">Tasks done</div></div>
     <div class="stat"><div class="icon" style="background:var(--indigo-tint); color:var(--indigo);">${ICONS.clock}</div><div class="val">${hoursToHM(todayHrs)}</div><div class="lbl">Studied today</div></div>
     <div class="stat"><div class="icon" style="background:var(--red-tint); color:var(--red);">${ICONS.revision}</div><div class="val">${revDue}</div><div class="lbl">Revision due</div></div>
+    <div class="stat"><div class="icon" style="background:var(--amber-tint); color:var(--amber);">${ICONS.star}</div><div class="val">${importantSyllabusPct()}%</div><div class="lbl">Important syllabus</div></div>
   </div>
 
   <div class="section-title">Syllabus completion</div>
@@ -1979,7 +2024,7 @@ function performDelete(kind, id){
    CHAPTERS / SYLLABUS TRACKER
    ============================================================ */
 let CHAPTER_SUBJECT = 'Physics';
-let CHAPTER_FILTER = { status:'', confidence:'', search:'' };
+let CHAPTER_FILTER = { status:'', confidence:'', important:false, search:'' };
 
 function scheduleRevisionsForChapter(chapterId){
   const exists = DATA.revisions.some(r=>r.chapterId===chapterId);
@@ -1998,10 +2043,12 @@ function renderChapters(){
   const subjects = ['Physics','Chemistry','Mathematics'];
   const stats = subjectStats(CHAPTER_SUBJECT);
   const overall = overallSyllabusPct();
+  const impPct = importantSyllabusPct();
 
   let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
   if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
 
@@ -2014,24 +2061,28 @@ function renderChapters(){
       <div class="stat"><div class="val">${chapterCompletionPct(CHAPTER_SUBJECT)}%</div><div class="lbl">${CHAPTER_SUBJECT}</div></div>
       <div class="stat"><div class="val">${stats.completed}</div><div class="lbl">Completed</div></div>
       <div class="stat"><div class="val" style="color:var(--red);">${stats.weak}</div><div class="lbl">Weak chapters</div></div>
+      <div class="stat"><div class="val" style="color:var(--amber);">${impPct}%</div><div class="lbl">Important syllabus</div></div>
     </div>
-    <div class="searchbar">
+    <div class="pill-searchbar">
+      <span class="ps-ico">${ICONS.search}</span>
       <input id="chSearch" placeholder="Search chapters..." value="${esc(CHAPTER_FILTER.search)}">
+      ${CHAPTER_FILTER.search ? `<button type="button" class="ps-clear" id="chSearchClear" aria-label="Clear search">&times;</button>` : ''}
     </div>
     <div class="filter-row">
-      <select id="chStatusFilter">
+      <select id="chStatusFilter" class="pill-select ${CHAPTER_FILTER.status?'active':''}">
         <option value="">All statuses</option>
         <option ${CHAPTER_FILTER.status==='Not Started'?'selected':''}>Not Started</option>
         <option ${CHAPTER_FILTER.status==='Studying'?'selected':''}>Studying</option>
         <option ${CHAPTER_FILTER.status==='Completed'?'selected':''}>Completed</option>
         <option ${CHAPTER_FILTER.status==='Revised'?'selected':''}>Revised</option>
       </select>
-      <select id="chConfFilter">
+      <select id="chConfFilter" class="pill-select ${CHAPTER_FILTER.confidence?'active':''}">
         <option value="">All confidence</option>
         <option ${CHAPTER_FILTER.confidence==='Weak'?'selected':''}>Weak</option>
         <option ${CHAPTER_FILTER.confidence==='Average'?'selected':''}>Average</option>
         <option ${CHAPTER_FILTER.confidence==='Strong'?'selected':''}>Strong</option>
       </select>
+      <button type="button" id="chImportantFilter" class="pill-toggle ${CHAPTER_FILTER.important?'active':''}">${ICONS.star} Important</button>
       <button class="btn secondary sm" onclick="openChapterModal()">+ Add Chapter</button>
     </div>
     <div class="list">
@@ -2041,8 +2092,11 @@ function renderChapters(){
   view('chapters').innerHTML = html;
   $all('.tab', view('chapters')).forEach(t=>t.addEventListener('click', ()=>{ CHAPTER_SUBJECT=t.dataset.subj; renderChapters(); }));
   $('#chSearch').addEventListener('input', e=>{ CHAPTER_FILTER.search=e.target.value; renderChaptersListOnly(); });
+  const clearBtn = document.getElementById('chSearchClear');
+  if(clearBtn) clearBtn.addEventListener('click', ()=>{ CHAPTER_FILTER.search=''; renderChapters(); });
   $('#chStatusFilter').addEventListener('change', e=>{ CHAPTER_FILTER.status=e.target.value; renderChapters(); });
   $('#chConfFilter').addEventListener('change', e=>{ CHAPTER_FILTER.confidence=e.target.value; renderChapters(); });
+  $('#chImportantFilter').addEventListener('click', ()=>{ CHAPTER_FILTER.important=!CHAPTER_FILTER.important; renderChapters(); });
   bindChapterRowEvents();
 }
 function renderChaptersListOnly(){
@@ -2050,6 +2104,7 @@ function renderChaptersListOnly(){
   let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
   if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
   const listEl = view('chapters').querySelector('.list');
@@ -2070,10 +2125,11 @@ function chapterStudyMinutes(c){
 function chapterRowHtml(c){
   const ps = chapterPracticeStats(c);
   return `
-  <div class="card" data-id="${c.id}" style="padding:14px; cursor:pointer;">
+  <div class="card ${c.important?'is-important':''}" data-id="${c.id}" style="padding:14px; cursor:pointer;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-      <div class="ri-title">${esc(c.name)}</div>
+      <div class="ri-title">${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</div>
       <div class="ri-actions">
+        <button class="icon-btn" data-chaction="important" aria-label="Mark important" style="${c.important?'color:var(--amber); border-color:var(--amber);':''}">${ICONS.star}</button>
         <button class="icon-btn" data-chaction="delete">${ICONS.trash}</button>
       </div>
     </div>
@@ -2104,6 +2160,15 @@ function bindChapterRowEvents(){
     e.stopPropagation();
     const id = b.closest('[data-id]').dataset.id;
     confirmDelete('chapter', id, 'Delete this chapter and its revision schedule?');
+  }));
+  $all('[data-chaction="important"]', view('chapters')).forEach(b=>b.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const id = b.closest('[data-id]').dataset.id;
+    updateData(d=>{
+      const ch = d.chapters.find(c=>c.id===id);
+      ch.important = !ch.important;
+    });
+    renderChapters();
   }));
   $all('[data-chfield]', view('chapters')).forEach(el=>{
     el.addEventListener('click', e=>e.stopPropagation());
@@ -2194,7 +2259,7 @@ function saveNewChapter(){
   const subject = $('#nc-subject').value;
   updateData(d=>{
     const order = d.chapters.filter(c=>c.subject===subject).length;
-    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', order});
+    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', important:false, order});
   });
   CHAPTER_SUBJECT = subject;
   closeModal();
@@ -2722,6 +2787,7 @@ function renderAnalytics(){
           const p = chapterCompletionPct(s);
           return `<div class="hbar-row"><div class="hb-label">${s}</div><div class="hb-track"><div style="width:${p}%; background:var(--green);"></div></div><div class="hb-val">${p}%</div></div>`;
         }).join('')}
+        <div class="hbar-row"><div class="hb-label">★ Important</div><div class="hb-track"><div style="width:${importantSyllabusPct()}%; background:var(--amber);"></div></div><div class="hb-val">${importantSyllabusPct()}%</div></div>
       </div>
     </div>
 
@@ -3055,8 +3121,8 @@ function openManualSessionModal(){
       <div class="field"><label>Chapter / Topic</label><select id="ms-chapter"><option value="">—</option>${chapterOptions('Physics')}</select></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Started at</label><input type="time" id="ms-start" value="18:00"></div>
-      <div class="field"><label>Ended at</label><input type="time" id="ms-end" value="19:00"></div>
+      <div class="field"><label>Hours</label><input type="number" id="ms-hours" min="0" max="23" step="1" value="1"></div>
+      <div class="field"><label>Minutes</label><input type="number" id="ms-minutes" min="0" max="59" step="1" value="0"></div>
     </div>
     <p class="muted" id="ms-duration-preview" style="margin-bottom:6px;"></p>
     <div class="modal-actions">
@@ -3068,20 +3134,16 @@ function openManualSessionModal(){
   const updatePreview = ()=>{
     const mins = manualSessionMinutes();
     const el = $('#ms-duration-preview');
-    if(el) el.textContent = mins>0 ? `Duration: ${hoursToHM(mins/60)}` : 'End time must be after start time';
+    if(el) el.textContent = mins>0 ? `Duration: ${hoursToHM(mins/60)}` : 'Enter how long you studied';
   };
-  $('#ms-start').addEventListener('input', updatePreview);
-  $('#ms-end').addEventListener('input', updatePreview);
+  $('#ms-hours').addEventListener('input', updatePreview);
+  $('#ms-minutes').addEventListener('input', updatePreview);
   updatePreview();
 }
 function manualSessionMinutes(){
-  const start = $('#ms-start').value, end = $('#ms-end').value;
-  if(!start || !end) return 0;
-  const [sh,sm] = start.split(':').map(Number);
-  const [eh,em] = end.split(':').map(Number);
-  let mins = (eh*60+em) - (sh*60+sm);
-  if(mins <= 0) mins += 24*60; // crosses midnight
-  return mins;
+  const h = Number($('#ms-hours').value)||0;
+  const m = Number($('#ms-minutes').value)||0;
+  return h*60+m;
 }
 function refreshManualChapterOptions(){
   const subj = $('#ms-subject').value;
@@ -3089,14 +3151,12 @@ function refreshManualChapterOptions(){
 }
 function saveManualSession(){
   const totalMinutes = manualSessionMinutes();
-  if(totalMinutes<=0){ toast('End time must be after start time'); return; }
+  if(totalMinutes<=0){ toast('Enter how long you studied'); return; }
   const date = $('#ms-date').value || todayStr();
   const subject = $('#ms-subject').value;
   const chapter = $('#ms-chapter').value;
-  const startTime = $('#ms-start').value;
-  const endTime = $('#ms-end').value;
   updateData(d=>{
-    d.studySessions.push({id:uid(), date, minutes: totalMinutes, subject, chapter, startTime, endTime});
+    d.studySessions.push({id:uid(), date, minutes: totalMinutes, subject, chapter});
   });
   closeModal();
   renderAll();
