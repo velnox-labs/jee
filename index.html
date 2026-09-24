@@ -809,7 +809,11 @@ function initAuthUI(){
 const LEGACY_LS_KEY = 'jeeTrackerData_v1';   // old single-user key
 let LS_KEY = LEGACY_LS_KEY;                   // becomes jeeTrackerData_v1_<uid> after login
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
-const todayStr = () => new Date().toISOString().slice(0,10);
+function ymd(d){
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+const todayStr = () => ymd(new Date());
 const $ = (sel, root=document) => root.querySelector(sel);
 const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
@@ -831,7 +835,7 @@ function daysBetween(a,b){
 function addDays(dateStr, n){
   const d = new Date(dateStr+'T00:00:00');
   d.setDate(d.getDate()+n);
-  return d.toISOString().slice(0,10);
+  return ymd(d);
 }
 function clamp(n,a,b){return Math.max(a, Math.min(b,n));}
 function pct(part, whole){ if(!whole) return 0; return clamp(Math.round((part/whole)*100),0,100); }
@@ -943,7 +947,7 @@ function nextJuneDate(offsetDays){
   let d = new Date(y+'-06-01T00:00:00');
   if(d < now) d = new Date((y+1)+'-06-01T00:00:00');
   if(offsetDays) d.setDate(d.getDate()+offsetDays);
-  return d.toISOString().slice(0,10);
+  return ymd(d);
 }
 
 let DATA = null;
