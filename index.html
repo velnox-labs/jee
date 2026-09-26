@@ -952,6 +952,12 @@ function nextJuneDate(offsetDays){
 
 let DATA = null;
 
+function normalizeWeightage(w){
+  const s = String(w).trim().toLowerCase();
+  if(s.startsWith('high')) return 'High';
+  if(s.startsWith('low')) return 'Low';
+  return 'Medium';
+}
 function loadData(){
   try{
     const raw = localStorage.getItem(LS_KEY);
@@ -962,6 +968,7 @@ function loadData(){
       DATA.settings = Object.assign(defaultData().settings, parsed.settings||{});
       DATA.streaks = Object.assign(defaultData().streaks, parsed.streaks||{});
       if(!DATA.chapters || DATA.chapters.length===0) DATA.chapters = defaultData().chapters;
+      DATA.chapters.forEach(c=>{ if(c.weightage) c.weightage = normalizeWeightage(c.weightage); });
     } else {
       DATA = defaultData();
       saveData();
@@ -1022,6 +1029,32 @@ function importantSyllabusPct(){
     return sum;
   },0);
   return pct(doneWeight, chs.length);
+}
+// Rough JEE Main marks(out of 300) -> percentile curve, based on commonly observed
+// past-year trends for a candidate pool of roughly 17 lakh. This is an ESTIMATE only —
+// actual percentile depends on that session's specific difficulty/distribution.
+const JEE_MARKS_PERCENTILE_TABLE = [
+  [300,100], [280,99.99], [250,99.95], [220,99.85], [200,99.65],
+  [180,99.3], [160,98.6], [140,97.2], [120,94.5], [100,90],
+  [90,86], [80,80.5], [70,74], [60,66], [50,56],
+  [40,45], [30,33], [20,21], [10,10], [0,0]
+];
+function estimateJeeMainPercentile(marks){
+  const t = JEE_MARKS_PERCENTILE_TABLE;
+  const m = Math.max(0, Math.min(300, Number(marks)||0));
+  for(let i=0;i<t.length-1;i++){
+    const [m1,p1] = t[i], [m2,p2] = t[i+1];
+    if(m<=m1 && m>=m2){
+      const frac = (m-m2)/(m1-m2);
+      return Math.round((p2 + frac*(p1-p2))*100)/100;
+    }
+  }
+  return m>=300 ? 100 : 0;
+}
+function recentPercentileAvg(n=3){
+  const withPct = DATA.tests.filter(t=>t.percentile!=null).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,n);
+  if(!withPct.length) return null;
+  return Math.round((withPct.reduce((s,t)=>s+Number(t.percentile),0)/withPct.length)*100)/100;
 }
 function subjectStats(subject){
   const chs = DATA.chapters.filter(c=>c.subject===subject);
@@ -1261,11 +1294,19 @@ function planCardHtml(){
   <div class="card">${head}<p class="muted">The exam date for this goal has passed. Update it in Settings to get a fresh plan.</p></div>`;
   }
   let pace;
+  let catchUpNote = '';
   if(p.remainingWork<=0) pace = 'Syllabus complete. Use the time for revision and mock tests.';
   else if(p.pace!==null){
-    pace = p.pace >= p.perWeekNeeded*0.9
-      ? `<b class="ok">On track.</b> You finished about ${p.pace} chapters a week recently.`
-      : `<b class="behind">Behind pace.</b> You are doing about ${p.pace} chapters a week and need about ${p.perWeekNeeded}.`;
+    const isBehind = p.pace < p.perWeekNeeded*0.9;
+    pace = isBehind
+      ? `<b class="behind">Behind pace.</b> You are doing about ${p.pace} chapters a week and need about ${p.perWeekNeeded}.`
+      : `<b class="ok">On track.</b> You finished about ${p.pace} chapters a week recently.`;
+    if(isBehind){
+      const priorityLeft = DATA.chapters.filter(c=>(c.important||c.weightage==='High') && c.status!=='Completed' && c.status!=='Revised').length;
+      if(priorityLeft>0){
+        catchUpNote = `<p class="plan-pace" style="color:var(--red);">Suggestion: focus on your ${priorityLeft} important/high-weightage chapter${priorityLeft===1?'':'s'} that ${priorityLeft===1?'is':'are'} still pending, before moving to the rest.</p>`;
+      }
+    }
   } else pace = 'Mark chapters as completed and your weekly pace will show here.';
 
   const rows = p.rows.map(r=>{
@@ -1291,6 +1332,7 @@ function planCardHtml(){
       <div class="plan-stat"><div class="v">${fmtDateShort(p.finishBy)}</div><div class="l">finish syllabus by</div></div>
     </div>
     <p class="plan-pace">${pace}</p>
+    ${catchUpNote}
     <div class="list">
       ${rows}
       <div class="row-item"><div class="ri-main"><div class="ri-title">Revision</div><div class="ri-sub">${revSub}</div></div></div>
@@ -1305,6 +1347,7 @@ function renderGoal(){
   view('goal').innerHTML = `${planCardHtml()}${s.goal ? goalAnalyticsExtraHtml() : ''}`;
 }
 function goalAnalyticsExtraHtml(){
+  const s = DATA.settings;
   const overall = overallSyllabusPct();
   const phy = chapterCompletionPct('Physics');
   const chem = chapterCompletionPct('Chemistry');
@@ -1313,6 +1356,17 @@ function goalAnalyticsExtraHtml(){
   const hrs30 = Math.round(last30.reduce((a,b)=>a+b.minutes,0)/60*10)/10;
   const questions30 = DATA.practiceSessions.filter(p=>p.date>addDays(todayStr(),-30)).reduce((a,b)=>a+(Number(b.attempted)||0),0);
   const tests30 = DATA.tests.filter(t=>t.date>addDays(todayStr(),-30)).length;
+  const avgPct = (s.goal && s.goal.type==='main_pct') ? recentPercentileAvg(3) : null;
+  const anyEstimated = DATA.tests.filter(t=>t.percentile!=null).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3).some(t=>t.percentileEstimated);
+  const gapHtml = avgPct!==null ? `
+  <div class="section-title">Percentile gap</div>
+  <div class="card">
+    <div class="grid grid-2">
+      <div class="stat"><div class="val">${s.goal.value}</div><div class="lbl">Target percentile</div></div>
+      <div class="stat"><div class="val" style="color:${avgPct>=s.goal.value?'var(--green)':'var(--red)'};">${avgPct}</div><div class="lbl">Recent avg (last 3 mocks)</div></div>
+    </div>
+    <p class="muted" style="margin-top:8px;">${avgPct>=s.goal.value ? 'You are meeting or beating your target in recent mocks.' : `You are ${Math.round((s.goal.value-avgPct)*100)/100} percentile behind your target right now.`}${anyEstimated ? ' Some values are auto-estimated from marks and may differ from the actual official percentile.' : ''}</p>
+  </div>` : '';
   return `
   <div class="section-title">Overall progress</div>
   <div class="card">
@@ -1330,7 +1384,8 @@ function goalAnalyticsExtraHtml(){
     <div class="stat"><div class="icon" style="background:var(--amber-tint); color:var(--amber);">${ICONS.practice}</div><div class="val">${questions30}</div><div class="lbl">Questions</div></div>
     <div class="stat"><div class="icon" style="background:var(--green-tint); color:var(--green);">${ICONS.tests}</div><div class="val">${tests30}</div><div class="lbl">Mock tests</div></div>
     <div class="stat"><div class="icon" style="background:var(--red-tint); color:var(--red);">${ICONS.revision}</div><div class="val">${DATA.revisions.filter(r=>r.completed && r.dueDate>addDays(todayStr(),-30)).length}</div><div class="lbl">Revisions done</div></div>
-  </div>`;
+  </div>
+  ${gapHtml}`;
 }
 function applyGoalTargets(){
   const g = DATA.settings.goal; if(!g) return;
@@ -1726,6 +1781,7 @@ function renderHome(){
   const streaks = DATA.streaks;
   const todayQ = questionsSolvedOn(todayStr());
   const todayHrs = studyHoursOn(todayStr());
+  const studyBehindAlert = new Date().getHours()>=20 && (s.dailyStudyHours-todayHrs)>0.5;
   const tTasks = todaysTasks();
   const doneTasks = tTasks.filter(t=>t.completed).length;
   const pendingCount = pendingTasksAll().length;
@@ -1775,7 +1831,8 @@ function renderHome(){
     <div class="grid grid-2">
       <div>
         <div class="pbar-row"><span>Study hours</span><span>${hoursToHM(todayHrs)} / ${s.dailyStudyHours}h</span></div>
-        <div class="pbar"><div style="width:${pct(todayHrs, s.dailyStudyHours)}%"></div></div>
+        <div class="pbar${studyBehindAlert?' danger':''}"><div style="width:${pct(todayHrs, s.dailyStudyHours)}%; ${studyBehindAlert?'background:var(--red);':''}"></div></div>
+        ${studyBehindAlert ? `<p style="color:var(--red); font-size:12px; margin-top:4px;">⚠️ You still need ${hoursToHM(s.dailyStudyHours-todayHrs)} more to hit today's target</p>` : ''}
       </div>
       <div>
         <div class="pbar-row"><span>Questions</span><span>${todayQ} / ${s.dailyQuestionTarget}</span></div>
@@ -2078,7 +2135,7 @@ function performDelete(kind, id){
    CHAPTERS / SYLLABUS TRACKER
    ============================================================ */
 let CHAPTER_SUBJECT = 'Physics';
-let CHAPTER_FILTER = { status:'', confidence:'', important:false, search:'' };
+let CHAPTER_FILTER = { status:'', confidence:'', weightage:'', important:false, search:'' };
 
 function scheduleRevisionsForChapter(chapterId){
   const exists = DATA.revisions.some(r=>r.chapterId===chapterId);
@@ -2102,6 +2159,7 @@ function renderChapters(){
   let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
   if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.weightage) chs = chs.filter(c=>(c.weightage||'Medium')===CHAPTER_FILTER.weightage);
   if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
@@ -2136,6 +2194,12 @@ function renderChapters(){
         <option ${CHAPTER_FILTER.confidence==='Average'?'selected':''}>Average</option>
         <option ${CHAPTER_FILTER.confidence==='Strong'?'selected':''}>Strong</option>
       </select>
+      <select id="chWeightFilter" class="pill-select ${CHAPTER_FILTER.weightage?'active':''}">
+        <option value="">All weightage</option>
+        <option ${CHAPTER_FILTER.weightage==='High'?'selected':''}>High</option>
+        <option ${CHAPTER_FILTER.weightage==='Medium'?'selected':''}>Medium</option>
+        <option ${CHAPTER_FILTER.weightage==='Low'?'selected':''}>Low</option>
+      </select>
       <button type="button" id="chImportantFilter" class="pill-toggle ${CHAPTER_FILTER.important?'active':''}">${ICONS.star} Important</button>
       <button class="btn secondary sm" onclick="openChapterModal()">+ Add Chapter</button>
     </div>
@@ -2150,6 +2214,7 @@ function renderChapters(){
   if(clearBtn) clearBtn.addEventListener('click', ()=>{ CHAPTER_FILTER.search=''; renderChapters(); });
   $('#chStatusFilter').addEventListener('change', e=>{ CHAPTER_FILTER.status=e.target.value; renderChapters(); });
   $('#chConfFilter').addEventListener('change', e=>{ CHAPTER_FILTER.confidence=e.target.value; renderChapters(); });
+  $('#chWeightFilter').addEventListener('change', e=>{ CHAPTER_FILTER.weightage=e.target.value; renderChapters(); });
   $('#chImportantFilter').addEventListener('click', ()=>{ CHAPTER_FILTER.important=!CHAPTER_FILTER.important; renderChapters(); });
   bindChapterRowEvents();
 }
@@ -2158,6 +2223,7 @@ function renderChaptersListOnly(){
   let chs = DATA.chapters.filter(c=>c.subject===CHAPTER_SUBJECT);
   if(CHAPTER_FILTER.status) chs = chs.filter(c=>c.status===CHAPTER_FILTER.status);
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
+  if(CHAPTER_FILTER.weightage) chs = chs.filter(c=>(c.weightage||'Medium')===CHAPTER_FILTER.weightage);
   if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
@@ -2176,6 +2242,11 @@ function chapterPracticeStats(c){
 function chapterStudyMinutes(c){
   return DATA.studySessions.filter(s=>s.subject===c.subject && s.chapter===c.name).reduce((s,x)=>s+Number(x.minutes||0),0);
 }
+const WEIGHTAGE_COLORS = {
+  High: 'color:var(--red); background:var(--red-tint);',
+  Medium: 'color:var(--amber); background:var(--amber-tint);',
+  Low: 'color:var(--green); background:var(--green-tint);',
+};
 function chapterRowHtml(c){
   const ps = chapterPracticeStats(c);
   return `
@@ -2193,6 +2264,9 @@ function chapterRowHtml(c){
       </select>
       <select class="chip" data-chfield="confidence" style="border:none; font-weight:700;">
         ${['Weak','Average','Strong'].map(s=>`<option ${c.confidence===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <select class="chip" data-chfield="weightage" style="border:none; font-weight:700; ${WEIGHTAGE_COLORS[c.weightage||'Medium']}">
+        ${['High','Medium','Low'].map(s=>`<option value="${s}" ${(c.weightage||'Medium')===s?'selected':''}>${s} weightage</option>`).join('')}
       </select>
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:10px;">
@@ -2266,7 +2340,7 @@ function openChapterDetail(id){
     <div class="modal-head"><h3>${esc(c.name)}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
     <p class="muted" style="margin-bottom:14px;">${esc(c.subject)} · <span class="badge studying">${esc(c.status)}</span> · <span class="badge ${c.confidence==='Weak'?'weak':''}">${esc(c.confidence)}</span></p>
 
-    <div class="section-title" style="margin-top:0;">Kitna padha (progress so far)</div>
+    <div class="section-title" style="margin-top:0;">Progress so far</div>
     <div class="grid grid-2" style="margin-bottom:14px;">
       <div class="card-flat"><div class="lbl muted">Study time</div><div style="font-weight:700; font-size:18px;">${hoursToHM(studyMin/60)}</div></div>
       <div class="card-flat"><div class="lbl muted">Tasks done</div><div style="font-weight:700; font-size:18px;">${tasksDone}/3</div></div>
@@ -2276,7 +2350,7 @@ function openChapterDetail(id){
       <div class="card-flat"><div class="lbl muted">Next revision</div><div style="font-weight:700; font-size:18px;">${nextRev?fmtDateShort(nextRev.dueDate):'—'}</div></div>
     </div>
 
-    <div class="section-title">Kitna baaki (still pending)</div>
+    <div class="section-title">Still pending</div>
     <div class="list" style="margin-bottom:14px;">
       ${remaining.length ? remaining.map(r=>`<div class="row-item"><div class="ri-main"><div class="ri-title">${esc(r)}</div></div></div>`).join('') : emptyState('✅','All caught up','Nothing pending for this chapter.')}
     </div>
@@ -2313,7 +2387,7 @@ function saveNewChapter(){
   const subject = $('#nc-subject').value;
   updateData(d=>{
     const order = d.chapters.filter(c=>c.subject===subject).length;
-    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', important:false, order});
+    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', important:false, weightage:'Medium', order});
   });
   CHAPTER_SUBJECT = subject;
   closeModal();
@@ -2461,6 +2535,29 @@ function savePractice(id){
    ============================================================ */
 let TEST_FILTER = { type:'' };
 
+function subjectAvgFromTests(field){
+  const withVal = DATA.tests.filter(t=>t[field]!=null);
+  if(!withVal.length) return null;
+  return Math.round(withVal.reduce((s,t)=>s+Number(t[field]),0)/withVal.length*10)/10;
+}
+function sparklineSvg(values, color){
+  if(values.length<2) return '';
+  const w=300, h=90, pad=10;
+  const max = Math.max(...values, 1), min = Math.min(...values, 0);
+  const range = (max-min)||1;
+  const stepX = (w-2*pad)/(values.length-1);
+  const pts = values.map((v,i)=>{
+    const x = pad + i*stepX;
+    const y = h-pad - ((v-min)/range)*(h-2*pad);
+    return {x,y};
+  });
+  const line = pts.map(p=>`${p.x},${p.y}`).join(' ');
+  const dots = pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}"></circle>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%; height:90px; display:block;">
+    <polyline points="${line}" fill="none" stroke="${color}" stroke-width="2"/>
+    ${dots}
+  </svg>`;
+}
 function renderTests(){
   let tests = DATA.tests.slice().sort((a,b)=>b.date.localeCompare(a.date));
   if(TEST_FILTER.type) tests = tests.filter(t=>t.type===TEST_FILTER.type);
@@ -2481,6 +2578,29 @@ function renderTests(){
     </div>`;
   }
 
+  const chronological = DATA.tests.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-10);
+  const scoreChart = chronological.length>=2 ? `
+    <div class="section-title">Score trend (last ${chronological.length} tests)</div>
+    <div class="card" style="padding:14px 10px; margin-bottom:16px;">${sparklineSvg(chronological.map(t=>Number(t.total||0)), 'var(--indigo)')}</div>` : '';
+
+  const pctTests = chronological.filter(t=>t.percentile!=null);
+  const percentileChart = pctTests.length>=2 ? `
+    <div class="section-title">Percentile trend</div>
+    <div class="card" style="padding:14px 10px; margin-bottom:16px;">${sparklineSvg(pctTests.map(t=>Number(t.percentile)), 'var(--amber)')}</div>` : '';
+
+  const subjAvgs = {Physics: subjectAvgFromTests('physics'), Chemistry: subjectAvgFromTests('chemistry'), Mathematics: subjectAvgFromTests('maths')};
+  const subjEntries = Object.entries(subjAvgs).filter(([,v])=>v!==null);
+  let weakest = null;
+  if(subjEntries.length>=2){
+    weakest = subjEntries.reduce((a,b)=>a[1]<=b[1]?a:b)[0];
+  }
+  const subjectAvgCard = subjEntries.length ? `
+    <div class="section-title">Average marks by subject (across mocks)</div>
+    <div class="card" style="margin-bottom:16px;">
+      ${subjEntries.map(([name,v])=>`<div class="hbar-row"><div class="hb-label">${name}${name===weakest?' ⚠️':''}</div><div class="hb-track"><div style="width:${Math.min(100,pct(v,100))}%; background:${name===weakest?'var(--red)':'var(--indigo)'};"></div></div><div class="hb-val">${v}</div></div>`).join('')}
+      ${weakest ? `<p class="muted" style="margin-top:8px;">${weakest} has your lowest average across mocks — spend extra practice time here.</p>` : ''}
+    </div>` : '';
+
   const html = `
     <div class="grid grid-4" style="margin-bottom:10px;">
       <div class="stat"><div class="val">${DATA.tests.length}</div><div class="lbl">Tests taken</div></div>
@@ -2490,6 +2610,9 @@ function renderTests(){
     </div>
     ${avgAttemptRate!==null ? `<div class="card-flat" style="margin-bottom:16px;"><div class="lbl muted">Average attempt rate</div><div style="font-weight:700; font-size:18px;">${avgAttemptRate}% of paper attempted</div></div>` : ''}
     ${improvement}
+    ${scoreChart}
+    ${percentileChart}
+    ${subjectAvgCard}
     <div class="section-title">Test history
       <select id="testTypeFilter" style="width:auto; padding:6px 10px; font-size:12.5px; border-radius:8px; border:1px solid var(--line); background:var(--paper);">
         <option value="">All types</option>
@@ -2513,11 +2636,12 @@ function renderTests(){
 }
 function testRowHtml(t){
   const totalQ = t.totalQuestions ? ` (${t.questions||0}/${t.totalQuestions})` : '';
+  const pctTxt = t.percentile!=null ? ` · ${t.percentile}%ile${t.percentileEstimated?' (est.)':''}` : '';
   return `
   <div class="row-item" data-id="${t.id}" style="align-items:flex-start; cursor:pointer;">
     <div class="ri-main" data-testaction="view">
       <div class="ri-title">${esc(t.name)} <span class="badge studying">${esc(t.type)}</span></div>
-      <div class="ri-sub">${fmtDateShort(t.date)} · Score ${t.total} · ${testAccuracy(t)}% accuracy${totalQ}</div>
+      <div class="ri-sub">${fmtDateShort(t.date)} · Score ${t.total} · ${testAccuracy(t)}% accuracy${totalQ}${pctTxt}</div>
     </div>
     <div class="ri-actions">
       <button class="icon-btn" data-testaction="edit">${ICONS.edit}</button>
@@ -2534,10 +2658,11 @@ function viewTestDetails(id){
   openModal(`
     <div class="modal-head"><h3>${esc(t.name)}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
     <p class="muted" style="margin-bottom:14px;">${esc(t.type)} · ${fmtDate(t.date)}</p>
-    <div class="grid grid-3" style="margin-bottom:14px;">
+    <div class="grid grid-2" style="margin-bottom:14px;">
       <div class="card-flat"><div class="lbl muted">Physics</div><div style="font-weight:700; font-size:17px;">${t.physics||0}</div></div>
       <div class="card-flat"><div class="lbl muted">Chemistry</div><div style="font-weight:700; font-size:17px;">${t.chemistry||0}</div></div>
       <div class="card-flat"><div class="lbl muted">Maths</div><div style="font-weight:700; font-size:17px;">${t.maths||0}</div></div>
+      <div class="card-flat"><div class="lbl muted">Percentile</div><div style="font-weight:700; font-size:17px;">${t.percentile!=null?t.percentile+(t.percentileEstimated?' (est.)':''):'—'}</div></div>
     </div>
     <div class="grid grid-2">
       <div class="card-flat"><div class="lbl muted">Total marks</div><div style="font-weight:700; font-size:18px;">${t.total}</div></div>
@@ -2565,6 +2690,7 @@ function openTestModal(id){
       </div>
       <div class="field"><label>Date</label><input type="date" id="tt-date" value="${editing?editing.date:todayStr()}"></div>
     </div>
+    <div class="field"><label>Percentile (optional — leave blank to auto-estimate from marks, JEE Main only)</label><input type="number" step="0.01" id="tt-percentile" value="${editing&&editing.percentile!=null&&!editing.percentileEstimated?editing.percentile:''}" placeholder="e.g. 97.5"></div>
     <div class="field-row">
       <div class="field"><label>Physics marks</label><input type="number" id="tt-physics" value="${editing?editing.physics:''}"></div>
       <div class="field"><label>Chemistry marks</label><input type="number" id="tt-chemistry" value="${editing?editing.chemistry:''}"></div>
@@ -2598,14 +2724,22 @@ function saveTest(id){
     total = (physics||0)+(chemistry||0)+(maths||0);
   }
   if(total===null){ toast('Enter total marks or subject-wise marks'); return; }
+  const testType = $('#tt-type').value;
+  let percentile = $('#tt-percentile').value===''?null:Number($('#tt-percentile').value);
+  let percentileEstimated = false;
+  if(percentile===null && testType==='JEE Main' && total!==null){
+    percentile = estimateJeeMainPercentile(total);
+    percentileEstimated = true;
+  }
   const payload = {
-    name, type: $('#tt-type').value, date: $('#tt-date').value || todayStr(),
+    name, type: testType, date: $('#tt-date').value || todayStr(),
     physics, chemistry, maths, total,
     totalQuestions: $('#tt-totalq').value===''?null:Number($('#tt-totalq').value),
     questions: Number($('#tt-questions').value)||0,
     correct: Number($('#tt-correct').value)||0,
     wrong: Number($('#tt-wrong').value)||0,
     timeTaken: Number($('#tt-time').value)||0,
+    percentile, percentileEstimated,
   };
   updateData(d=>{
     if(id) Object.assign(d.tests.find(t=>t.id===id), payload);
