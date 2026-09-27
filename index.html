@@ -955,7 +955,10 @@ function defaultData(){
       minStudyMinutesForStreak: 15,
       minQuestionsForStreak: 10,
       minRevisionsForStreak: 1,
-      goal: null   // {type, value, dream}
+      goal: null,   // {type, value, dream}
+      targetCollegeId: '',
+      customCollegeName: '',
+      customCollegePercentile: null,
     },
     tasks:[],
     recurringTasks:[],
@@ -1205,6 +1208,19 @@ function recomputeStreaks(){
    ============================================================ */
 const PLAN_SUBJECTS = ['Physics','Chemistry','Mathematics'];
 const PLAN_COLORS = {Physics:'#3E6FD9', Chemistry:'var(--green)', Mathematics:'var(--amber)'};
+// Reference points only — based on recent (2025-26) JoSAA/UPTAC closing ranks for
+// General category CSE, converted to a percentile estimate assuming ~17 lakh JEE Main
+// candidates (same assumption used elsewhere in this app). Actual cutoffs shift every
+// year with difficulty, seat count and category — treat this as a rough benchmark, not
+// a guarantee.
+const TARGET_COLLEGES = [
+  {id:'mnnit',  name:'MNNIT Allahabad (CSE)',   percentile:99.7, rankNote:'~5,000 (2026)'},
+  {id:'iiita',  name:'IIIT Allahabad (CSE)',    percentile:99.5, rankNote:'~7,000-9,000 (2026)'},
+  {id:'iiitl',  name:'IIIT Lucknow (CSE)',      percentile:99.5, rankNote:'~9,000 (2026)'},
+  {id:'hbtu',   name:'HBTU Kanpur (CSE)',       percentile:98.3, rankNote:'~29,000 (2026)'},
+  {id:'ietl',   name:'IET Lucknow (CSE)',       percentile:97.5, rankNote:'~40,000-47,000 (2026)'},
+  {id:'mmmut',  name:'MMMUT Gorakhpur (CSE)',   percentile:95.9, rankNote:'~70,000 (2025)'},
+];
 const GOAL_TYPES = {
   main_pct:  {label:'JEE Main percentile',      exam:'main', valueLabel:'Target percentile', placeholder:'e.g. 99'},
   main_rank: {label:'JEE Main rank (AIR)',      exam:'main', valueLabel:'Target rank (better than)', placeholder:'e.g. 10000'},
@@ -1372,6 +1388,15 @@ function renderGoal(){
   const s = DATA.settings;
   view('goal').innerHTML = `${planCardHtml()}${s.goal ? goalAnalyticsExtraHtml() : ''}`;
 }
+function getTargetCollegeInfo(){
+  const s = DATA.settings;
+  if(!s.targetCollegeId) return null;
+  if(s.targetCollegeId==='custom'){
+    if(s.customCollegePercentile==null) return null;
+    return {name: s.customCollegeName||'Custom target', percentile: s.customCollegePercentile, rankNote:null};
+  }
+  return TARGET_COLLEGES.find(c=>c.id===s.targetCollegeId) || null;
+}
 function goalAnalyticsExtraHtml(){
   const s = DATA.settings;
   const overall = overallSyllabusPct();
@@ -1382,7 +1407,8 @@ function goalAnalyticsExtraHtml(){
   const hrs30 = Math.round(last30.reduce((a,b)=>a+b.minutes,0)/60*10)/10;
   const questions30 = DATA.practiceSessions.filter(p=>p.date>addDays(todayStr(),-30)).reduce((a,b)=>a+(Number(b.attempted)||0),0);
   const tests30 = DATA.tests.filter(t=>t.date>addDays(todayStr(),-30)).length;
-  const avgPct = (s.goal && s.goal.type==='main_pct') ? recentPercentileAvg(3) : null;
+  const avgPctAny = recentPercentileAvg(3);
+  const avgPct = (s.goal && s.goal.type==='main_pct') ? avgPctAny : null;
   const anyEstimated = DATA.tests.filter(t=>t.percentile!=null).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3).some(t=>t.percentileEstimated);
   const gapHtml = avgPct!==null ? `
   <div class="section-title">Percentile gap</div>
@@ -1392,6 +1418,17 @@ function goalAnalyticsExtraHtml(){
       <div class="stat"><div class="val" style="color:${avgPct>=s.goal.value?'var(--green)':'var(--red)'};">${avgPct}</div><div class="lbl">Recent avg (last 3 mocks)</div></div>
     </div>
     <p class="muted" style="margin-top:8px;">${avgPct>=s.goal.value ? 'You are meeting or beating your target in recent mocks.' : `You are ${Math.round((s.goal.value-avgPct)*100)/100} percentile behind your target right now.`}${anyEstimated ? ' Some values are auto-estimated from marks and may differ from the actual official percentile.' : ''}</p>
+  </div>` : '';
+
+  const college = getTargetCollegeInfo();
+  const collegeGapHtml = college ? `
+  <div class="section-title">College target</div>
+  <div class="card">
+    <div class="grid grid-2">
+      <div class="stat"><div class="val">${college.percentile}</div><div class="lbl">${esc(college.name)}${college.rankNote?' · rank '+college.rankNote:''}</div></div>
+      <div class="stat"><div class="val" style="color:${(avgPctAny!==null && avgPctAny>=college.percentile)?'var(--green)':'var(--red)'};">${avgPctAny!==null?avgPctAny:'—'}</div><div class="lbl">Recent avg (last 3 mocks)</div></div>
+    </div>
+    <p class="muted" style="margin-top:8px;">${avgPctAny===null ? 'Log a mock test with a percentile (or marks, for auto-estimate) to see your gap.' : avgPctAny>=college.percentile ? `You are matching or beating this college's recent cutoff range in your mocks.` : `You are about ${Math.round((college.percentile-avgPctAny)*100)/100} percentile behind this college's recent cutoff range.`}${college.rankNote ? ' Cutoffs shift every year — treat this as a rough benchmark, not a guarantee.' : ''}</p>
   </div>` : '';
   return `
   <div class="section-title">Overall progress</div>
@@ -1411,7 +1448,8 @@ function goalAnalyticsExtraHtml(){
     <div class="stat"><div class="icon" style="background:var(--green-tint); color:var(--green);">${ICONS.tests}</div><div class="val">${tests30}</div><div class="lbl">Mock tests</div></div>
     <div class="stat"><div class="icon" style="background:var(--red-tint); color:var(--red);">${ICONS.revision}</div><div class="val">${DATA.revisions.filter(r=>r.completed && r.dueDate>addDays(todayStr(),-30)).length}</div><div class="lbl">Revisions done</div></div>
   </div>
-  ${gapHtml}`;
+  ${gapHtml}
+  ${collegeGapHtml}`;
 }
 function applyGoalTargets(){
   const g = DATA.settings.goal; if(!g) return;
@@ -1541,6 +1579,81 @@ function checkDateRollover(){
     ensureRecurringTasksForToday();
     renderAll();
   }
+}
+
+const MOTIVATIONAL_QUOTES = [
+  "Small steps every day add up to big results.",
+  "You don't have to be perfect today — just consistent.",
+  "The exam doesn't care how you feel. Show up anyway.",
+  "One more chapter today is one less chapter tomorrow.",
+  "Discipline beats motivation on the hard days.",
+  "Every question you solve today is a rank climbed tomorrow.",
+  "Focus on today's plan. The result takes care of itself.",
+  "Tired is normal. Quitting is a choice — don't make it.",
+  "Your future self is counting on what you do right now.",
+  "Progress, not perfection.",
+  "The days you don't feel like it are the days that count the most.",
+  "Consistency compounds. Show up again today."
+];
+function pickDailyQuote(){
+  const d = todayStr();
+  let hash = 0;
+  for(let i=0;i<d.length;i++) hash = (hash*31 + d.charCodeAt(i)) >>> 0;
+  return MOTIVATIONAL_QUOTES[hash % MOTIVATIONAL_QUOTES.length];
+}
+function weeklyRecapHtml(){
+  const start = addDays(todayStr(), -7), end = addDays(todayStr(), -1);
+  const sessions = DATA.studySessions.filter(s=>s.date>=start && s.date<=end);
+  const hrs = Math.round(sessions.reduce((a,b)=>a+Number(b.minutes||0),0)/60*10)/10;
+  const q = DATA.practiceSessions.filter(p=>p.date>=start && p.date<=end).reduce((a,b)=>a+(Number(b.attempted)||0),0);
+  const testsCount = DATA.tests.filter(t=>t.date>=start && t.date<=end).length;
+  const subjMins = {Physics:0, Chemistry:0, Mathematics:0};
+  sessions.forEach(s=>{ if(subjMins[s.subject]!=null) subjMins[s.subject]+=Number(s.minutes||0); });
+  const entries = Object.entries(subjMins);
+  const least = entries.length ? entries.reduce((a,b)=>a[1]<=b[1]?a:b)[0] : null;
+  return `
+  <div class="section-title" style="margin-top:14px;">Last week's recap</div>
+  <div class="grid grid-2" style="margin-bottom:6px;">
+    <div class="stat"><div class="val">${hoursToHM(hrs)}</div><div class="lbl">Studied</div></div>
+    <div class="stat"><div class="val">${q}</div><div class="lbl">Questions</div></div>
+    <div class="stat"><div class="val">${testsCount}</div><div class="lbl">Mock tests</div></div>
+    <div class="stat"><div class="val" style="color:var(--amber);">${least||'—'}</div><div class="lbl">Needs more focus</div></div>
+  </div>`;
+}
+function maybeShowDailyPopup(){
+  const key = 'jeeTrackerLastPopupDate';
+  let last = null;
+  try{ last = localStorage.getItem(key); }catch(e){}
+  const today = todayStr();
+  if(last===today) return;
+  try{ localStorage.setItem(key, today); }catch(e){}
+  showDailyPopup();
+}
+function showDailyPopup(){
+  const s = DATA.settings;
+  const yesterday = addDays(todayStr(), -1);
+  const yHrs = studyHoursOn(yesterday);
+  const yQ = questionsSolvedOn(yesterday);
+  const mainDays = s.jeeMainDate ? Math.max(0, daysUntil(s.jeeMainDate)) : null;
+  const metTarget = yHrs >= (s.dailyStudyHours||0);
+  const isMonday = new Date().getDay()===1;
+
+  const html = `
+    <div class="modal-head"><h3>Welcome back</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    ${mainDays!=null ? `<div class="card-flat" style="margin-bottom:14px; text-align:center;"><div style="font-size:13px; color:var(--ink-soft);">JEE Main in</div><div style="font-size:32px; font-weight:800; color:var(--indigo);">${mainDays} days</div></div>` : ''}
+    <p style="margin-bottom:14px; font-style:italic; color:var(--ink-soft);">"${pickDailyQuote()}"</p>
+    <div class="section-title" style="margin-top:0;">Yesterday</div>
+    <div class="grid grid-2" style="margin-bottom:6px;">
+      <div class="stat"><div class="val">${hoursToHM(yHrs)}</div><div class="lbl">Studied</div></div>
+      <div class="stat"><div class="val">${yQ}</div><div class="lbl">Questions solved</div></div>
+    </div>
+    ${(yHrs>0 || yQ>0)
+      ? `<p class="muted" style="margin-bottom:4px;">${metTarget ? "You hit your daily target yesterday. Keep it going." : `You were short of your ${s.dailyStudyHours}h target yesterday — try to make it up today.`}</p>`
+      : `<p class="muted" style="margin-bottom:4px;">No study logged yesterday. Fresh start today.</p>`}
+    ${isMonday ? weeklyRecapHtml() : ''}
+    <div class="modal-actions" style="margin-top:18px;"><button class="btn block" onclick="closeModal()">Let's go</button></div>
+  `;
+  openModal(html);
 }
 
 function buildSidebar(){
@@ -1712,6 +1825,7 @@ async function startSession(user){
   buildBottomNav();
   updateTopDate();
   switchView('home');
+  maybeShowDailyPopup();
   setInterval(()=>{ updateTopDate(); tickCountdowns(); checkDateRollover(); }, 30000);
   setInterval(()=>{ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }, 1000);
 
@@ -1771,6 +1885,10 @@ function openMoreMenu(){
           <span class="icon-btn" style="pointer-events:none;">${ICONS.home}</span>
           <div class="ri-main" style="pointer-events:none;"><div class="ri-title">Install App on Home Screen</div></div>
         </button>` : ''}
+      <button class="row-item" style="width:100%; border:1px solid var(--line); cursor:pointer;" id="shareProgressBtn">
+        <span class="icon-btn" style="pointer-events:none;">📤</span>
+        <div class="ri-main" style="pointer-events:none;"><div class="ri-title">Share Today's Progress</div></div>
+      </button>
     </div>
   `);
   $all('[data-goto]').forEach(b=>b.addEventListener('click', ()=>{ closeModal(); switchView(b.dataset.goto); }));
@@ -1782,6 +1900,119 @@ function openMoreMenu(){
     await DEFERRED_INSTALL_PROMPT.userChoice;
     DEFERRED_INSTALL_PROMPT = null;
   });
+  document.getElementById('shareProgressBtn').addEventListener('click', ()=>{ closeModal(); openShareCardModal(); });
+}
+
+function openShareCardModal(){
+  openModal(`
+    <div class="modal-head"><h3>Share Today's Progress</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div style="display:flex; justify-content:center; margin-bottom:14px;">
+      <canvas id="shareCanvas" width="1080" height="1350" style="width:100%; max-width:320px; border-radius:14px; box-shadow:var(--shadow); background:#1F2A78;"></canvas>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Close</button>
+      <button class="btn" id="shareDownloadBtn">Download / Share</button>
+    </div>
+  `);
+  drawShareCard();
+  document.getElementById('shareDownloadBtn').addEventListener('click', shareOrDownloadCard);
+}
+function roundRectPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  const lines = [];
+  words.forEach(w=>{
+    const test = line + w + ' ';
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line.trim());
+      line = w + ' ';
+    } else line = test;
+  });
+  lines.push(line.trim());
+  const startY = y - (lines.length-1)*lineHeight;
+  lines.forEach((l,i)=>ctx.fillText(l, x, startY+i*lineHeight));
+}
+function drawShareCard(){
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, '#3E4FD9');
+  grad.addColorStop(1, '#1F2A78');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  const dateLabel = new Date().toLocaleDateString('en-IN', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = '600 30px system-ui, sans-serif';
+  ctx.fillText(dateLabel, W/2, 110);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '800 56px system-ui, sans-serif';
+  ctx.fillText("Today's Progress", W/2, 190);
+
+  const hrs = studyHoursOn(todayStr());
+  const q = questionsSolvedOn(todayStr());
+  const tTasks = todaysTasks();
+  const doneTasks = tTasks.filter(t=>t.completed).length;
+  const streak = DATA.streaks.study.current;
+  const testsToday = DATA.tests.filter(t=>t.date===todayStr());
+
+  const stats = [
+    {label:'Hours studied', value: hoursToHM(hrs)},
+    {label:'Questions solved', value: String(q)},
+    {label:'Tasks completed', value: `${doneTasks}/${tTasks.length}`},
+    {label:'Current streak', value: `${streak} day${streak===1?'':'s'}`},
+  ];
+  if(testsToday.length){
+    stats.push({label:'Mock test score', value: String(testsToday[testsToday.length-1].total)});
+  }
+
+  const startY = 280, cardH = 150, gap = 28, cardW = W-160;
+  stats.forEach((st,i)=>{
+    const y = startY + i*(cardH+gap);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    roundRectPath(ctx, 80, y, cardW, cardH, 24);
+    ctx.fill();
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 64px system-ui, sans-serif';
+    ctx.fillText(st.value, 120, y+95);
+    ctx.font = '500 28px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillText(st.label, 120, y+130);
+  });
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = 'italic 500 30px system-ui, sans-serif';
+  wrapCanvasText(ctx, '"'+pickDailyQuote()+'"', W/2, H-90, W-160, 40);
+}
+function shareOrDownloadCard(){
+  const canvas = document.getElementById('shareCanvas');
+  canvas.toBlob(async (blob)=>{
+    if(!blob) return;
+    const file = new File([blob], `progress-${todayStr()}.png`, {type:'image/png'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:'My study progress'}); return; }catch(e){}
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `progress-${todayStr()}.png`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }, 'image/png');
 }
 
 document.addEventListener('DOMContentLoaded', boot);
@@ -2234,7 +2465,7 @@ function performDelete(kind, id){
    CHAPTERS / SYLLABUS TRACKER
    ============================================================ */
 let CHAPTER_SUBJECT = 'Physics';
-let CHAPTER_FILTER = { status:'', confidence:'', weightage:'', important:false, search:'' };
+let CHAPTER_FILTER = { status:'', confidence:'', weightage:'', important:false, pyqPending:false, search:'' };
 
 function scheduleRevisionsForChapter(chapterId){
   const exists = DATA.revisions.some(r=>r.chapterId===chapterId);
@@ -2260,6 +2491,7 @@ function renderChapters(){
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
   if(CHAPTER_FILTER.weightage) chs = chs.filter(c=>(c.weightage||'Medium')===CHAPTER_FILTER.weightage);
   if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
+  if(CHAPTER_FILTER.pyqPending) chs = chs.filter(c=>(c.status==='Completed'||c.status==='Revised') && !c.pyqsDone);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
 
@@ -2300,6 +2532,7 @@ function renderChapters(){
         <option ${CHAPTER_FILTER.weightage==='Low'?'selected':''}>Low</option>
       </select>
       <button type="button" id="chImportantFilter" class="pill-toggle ${CHAPTER_FILTER.important?'active':''}">${ICONS.star} Important</button>
+      <button type="button" id="chPyqPendingFilter" class="pill-toggle ${CHAPTER_FILTER.pyqPending?'active':''}">${ICONS.practice} PYQ Pending</button>
       <button class="btn secondary sm" onclick="openChapterModal()">+ Add Chapter</button>
     </div>
     <div class="list">
@@ -2315,6 +2548,7 @@ function renderChapters(){
   $('#chConfFilter').addEventListener('change', e=>{ CHAPTER_FILTER.confidence=e.target.value; renderChapters(); });
   $('#chWeightFilter').addEventListener('change', e=>{ CHAPTER_FILTER.weightage=e.target.value; renderChapters(); });
   $('#chImportantFilter').addEventListener('click', ()=>{ CHAPTER_FILTER.important=!CHAPTER_FILTER.important; renderChapters(); });
+  $('#chPyqPendingFilter').addEventListener('click', ()=>{ CHAPTER_FILTER.pyqPending=!CHAPTER_FILTER.pyqPending; renderChapters(); });
   bindChapterRowEvents();
 }
 function renderChaptersListOnly(){
@@ -2324,6 +2558,7 @@ function renderChaptersListOnly(){
   if(CHAPTER_FILTER.confidence) chs = chs.filter(c=>c.confidence===CHAPTER_FILTER.confidence);
   if(CHAPTER_FILTER.weightage) chs = chs.filter(c=>(c.weightage||'Medium')===CHAPTER_FILTER.weightage);
   if(CHAPTER_FILTER.important) chs = chs.filter(c=>!!c.important);
+  if(CHAPTER_FILTER.pyqPending) chs = chs.filter(c=>(c.status==='Completed'||c.status==='Revised') && !c.pyqsDone);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
   const listEl = view('chapters').querySelector('.list');
@@ -2346,12 +2581,29 @@ const WEIGHTAGE_COLORS = {
   Medium: 'color:var(--amber); background:var(--amber-tint);',
   Low: 'color:var(--green); background:var(--green-tint);',
 };
+function chapterLastStudiedDate(c){
+  let last = null;
+  DATA.studySessions.forEach(s=>{ if(s.subject===c.subject && s.chapter===c.name && (!last || s.date>last)) last = s.date; });
+  DATA.practiceSessions.forEach(p=>{ if(p.subject===c.subject && p.chapter===c.name && (!last || p.date>last)) last = p.date; });
+  return last;
+}
+function relativeDayLabel(dateStr){
+  const diff = daysBetween(dateStr, todayStr());
+  if(diff<=0) return 'today';
+  if(diff===1) return 'yesterday';
+  if(diff<=6) return diff+' days ago';
+  return fmtDateShort(dateStr);
+}
 function chapterRowHtml(c){
   const ps = chapterPracticeStats(c);
+  const lastDate = chapterLastStudiedDate(c);
   return `
   <div class="card ${c.important?'is-important':''}" data-id="${c.id}" style="padding:14px; cursor:pointer;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-      <div class="ri-title">${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</div>
+      <div>
+        <div class="ri-title">${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</div>
+        <div class="muted" style="font-size:11.5px; margin-top:2px;">${lastDate ? 'Last studied '+relativeDayLabel(lastDate) : 'Not studied yet'}</div>
+      </div>
       <div class="ri-actions">
         <button class="icon-btn" data-chaction="important" aria-label="Mark important" style="${c.important?'color:var(--amber); border-color:var(--amber);':''}">${ICONS.star}</button>
         <button class="icon-btn" data-chaction="delete">${ICONS.trash}</button>
@@ -3217,6 +3469,22 @@ function renderSettings(){
       <button type="button" class="btn secondary block" onclick="openGoalModal()">${s.goal ? 'Edit goal' : 'Set goal'}</button>
     </div>
 
+    <div class="section-title">Target college</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="field"><label>Compare your mocks against</label>
+        <select id="st-targetCollege">
+          <option value="" ${!s.targetCollegeId?'selected':''}>None</option>
+          ${TARGET_COLLEGES.map(c=>`<option value="${c.id}" ${s.targetCollegeId===c.id?'selected':''}>${c.name} (~${c.percentile} percentile)</option>`).join('')}
+          <option value="custom" ${s.targetCollegeId==='custom'?'selected':''}>Custom / Other</option>
+        </select>
+      </div>
+      <div class="field-row" id="st-customCollegeRow" style="${s.targetCollegeId==='custom'?'':'display:none;'}">
+        <div class="field"><label>College name</label><input id="st-customCollegeName" value="${esc(s.customCollegeName||'')}" placeholder="e.g. KNIT Sultanpur"></div>
+        <div class="field"><label>Target percentile</label><input type="number" step="0.01" id="st-customCollegePct" value="${s.customCollegePercentile!=null?s.customCollegePercentile:''}" placeholder="e.g. 96"></div>
+      </div>
+      <p class="muted">Reference cutoffs are based on recent JoSAA/UPTAC data — actual cutoffs shift every year, so treat this as a rough benchmark, not a guarantee. You can change this anytime.</p>
+    </div>
+
     <div class="section-title">Daily targets</div>
     <div class="card" style="margin-bottom:16px;">
       <div class="field-row">
@@ -3282,6 +3550,9 @@ function renderSettings(){
     DATA.settings.theme = b.dataset.theme;
     applyTheme();
   }));
+  $('#st-targetCollege').addEventListener('change', e=>{
+    $('#st-customCollegeRow').style.display = e.target.value==='custom' ? '' : 'none';
+  });
 }
 function saveSettings(){
   updateData(d=>{
@@ -3305,6 +3576,10 @@ function saveSettings(){
     d.settings.minStudyMinutesForStreak = Math.max(0, Number($('#st-minStudy').value)||0);
     d.settings.minQuestionsForStreak = Math.max(0, Number($('#st-minQ').value)||0);
     d.settings.minRevisionsForStreak = Math.max(0, Number($('#st-minRev').value)||0);
+
+    d.settings.targetCollegeId = $('#st-targetCollege').value;
+    d.settings.customCollegeName = $('#st-customCollegeName') ? $('#st-customCollegeName').value.trim() : d.settings.customCollegeName;
+    d.settings.customCollegePercentile = $('#st-customCollegePct') && $('#st-customCollegePct').value!=='' ? Number($('#st-customCollegePct').value) : null;
   });
   applyTheme();
   toast('Settings saved');
