@@ -266,6 +266,11 @@ button.streak-chip:focus-visible{outline:2px solid var(--indigo); outline-offset
 }
 .fab svg{width:24px; height:24px;}
 @media (min-width:900px){.fab{bottom:28px;}}
+.fab-alert{
+  bottom:154px; width:44px; height:44px; background:var(--red);
+  box-shadow:0 8px 20px rgba(209,75,75,.4); font-weight:800; font-size:16px;
+}
+@media (min-width:900px){.fab-alert{bottom:96px;}}
 
 /* forms */
 .field{margin-bottom:13px;}
@@ -325,6 +330,7 @@ button.streak-chip:focus-visible{outline:2px solid var(--indigo); outline-offset
 .tabs{display:flex; gap:6px; overflow-x:auto; margin-bottom:14px; -webkit-overflow-scrolling:touch;}
 
 .cal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.readiness-num{font-size:44px; font-weight:800; line-height:1;}
 .cal-title{font-weight:700; font-size:16px;}
 .cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:11px; color:var(--ink-soft); font-weight:600; margin-bottom:4px;}
 .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px;}
@@ -426,10 +432,12 @@ button.streak-chip:focus-visible{outline:2px solid var(--indigo); outline-offset
   position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
   background:var(--ink); color:var(--paper); padding:11px 18px; border-radius:24px; font-size:13.5px;
   font-weight:500; z-index:200; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  box-shadow:0 8px 24px rgba(0,0,0,.25); display:flex; align-items:center; gap:10px; white-space:nowrap;
 }
 :root[data-theme="dark"] .toast{background:#EDEFF7; color:#12141C;}
-.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto;}
+.toast-action{background:none; border:none; color:#8FB0FF; font-weight:700; font-size:13.5px; cursor:pointer; padding:0;}
+:root[data-theme="dark"] .toast-action{color:#3E4FD9;}
 @media (min-width:900px){.toast{bottom:24px;}}
 
 /* bottom nav mobile */
@@ -639,6 +647,7 @@ table.simple td{padding:9px 8px; border-bottom:1px solid var(--line);}
 <button class="fab" id="fabBtn" aria-label="Quick add">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
+<button class="fab fab-alert" id="deadlineFabBtn" aria-label="Chapter deadlines" style="display:none;"></button>
 
 <!-- Modal root -->
 <div class="modal-backdrop" id="modalBackdrop">
@@ -882,12 +891,21 @@ function secToClock(sec){
 function esc(str){
   return String(str==null?'':str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function toast(msg){
+function toast(msg, action){
   const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('show');
   clearTimeout(toast._tm);
-  toast._tm = setTimeout(()=>t.classList.remove('show'), 2200);
+  if(action){
+    t.innerHTML = `<span>${esc(msg)}</span><button type="button" class="toast-action" id="toastActionBtn">${esc(action.label)}</button>`;
+    document.getElementById('toastActionBtn').addEventListener('click', ()=>{
+      t.classList.remove('show');
+      clearTimeout(toast._tm);
+      action.onClick();
+    });
+  } else {
+    t.textContent = msg;
+  }
+  t.classList.add('show');
+  toast._tm = setTimeout(()=>t.classList.remove('show'), action ? 5000 : 2200);
 }
 
 /* ---------------- Default chapter lists ---------------- */
@@ -1023,8 +1041,11 @@ function updateData(mutatorFn){
   saveData();
 }
 function deleteData(collection, id){
+  const idx = DATA[collection].findIndex(x=>x.id===id);
+  const item = idx>-1 ? DATA[collection][idx] : null;
   DATA[collection] = DATA[collection].filter(x=>x.id!==id);
   saveData();
+  return {item, idx};
 }
 function resetAllData(){
   DATA = defaultData();
@@ -1036,6 +1057,15 @@ function resetAllData(){
 /* ============================================================
    DERIVED STATS
    ============================================================ */
+function overdueChapters(){
+  const t = todayStr();
+  return DATA.chapters.filter(c=>c.completeByDate && c.completeByDate<t && c.status!=='Completed' && c.status!=='Revised');
+}
+function upcomingDeadlineChapters(){
+  const t = todayStr();
+  return DATA.chapters.filter(c=>c.completeByDate && c.completeByDate>=t && c.status!=='Completed' && c.status!=='Revised')
+    .sort((a,b)=>a.completeByDate.localeCompare(b.completeByDate));
+}
 function chapterCompletionPct(subject){
   const chs = DATA.chapters.filter(c=> !subject || c.subject===subject);
   if(chs.length===0) return 0;
@@ -1084,6 +1114,32 @@ function recentPercentileAvg(n=3){
   const withPct = DATA.tests.filter(t=>t.percentile!=null).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,n);
   if(!withPct.length) return null;
   return Math.round((withPct.reduce((s,t)=>s+Number(t.percentile),0)/withPct.length)*100)/100;
+}
+function computeRecords(){
+  const dailyMinutes = {};
+  DATA.studySessions.forEach(s=>{ dailyMinutes[s.date] = (dailyMinutes[s.date]||0) + Number(s.minutes||0); });
+  const bestDayEntries = Object.entries(dailyMinutes).sort((a,b)=>b[1]-a[1]);
+  const bestDay = bestDayEntries[0] || null;
+
+  const dailyQ = {};
+  DATA.practiceSessions.forEach(p=>{ dailyQ[p.date] = (dailyQ[p.date]||0) + Number(p.attempted||0); });
+  const bestQEntries = Object.entries(dailyQ).sort((a,b)=>b[1]-a[1]);
+  const bestQ = bestQEntries[0] || null;
+
+  const sortedTests = DATA.tests.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  let bestJump = null;
+  for(let i=1;i<sortedTests.length;i++){
+    const diff = Number(sortedTests[i].total||0) - Number(sortedTests[i-1].total||0);
+    if(bestJump===null || diff>bestJump) bestJump = diff;
+  }
+  const bestScore = DATA.tests.length ? Math.max(...DATA.tests.map(t=>Number(t.total||0))) : null;
+
+  return {
+    bestDayHours: bestDay ? Math.round(bestDay[1]/60*10)/10 : 0, bestDayDate: bestDay ? bestDay[0] : null,
+    bestQ: bestQ ? bestQ[1] : 0, bestQDate: bestQ ? bestQ[0] : null,
+    longestStreak: DATA.streaks.study.longest,
+    bestJump, bestScore,
+  };
 }
 function subjectStats(subject){
   const chs = DATA.chapters.filter(c=>c.subject===subject);
@@ -1750,6 +1806,7 @@ function renderView(viewId){
 function renderAll(){
   recomputeStreaks();
   updateTopStreak();
+  updateDeadlineFab();
   renderView(CURRENT_VIEW);
 }
 
@@ -1825,11 +1882,13 @@ async function startSession(user){
   buildBottomNav();
   updateTopDate();
   switchView('home');
+  updateDeadlineFab();
   maybeShowDailyPopup();
   setInterval(()=>{ updateTopDate(); tickCountdowns(); checkDateRollover(); }, 30000);
   setInterval(()=>{ if(CURRENT_VIEW==='home') renderHomeCountdownOnly(); }, 1000);
 
   $('#fabBtn').addEventListener('click', openQuickAddMenu);
+  $('#deadlineFabBtn').addEventListener('click', openDeadlinePanel);
   $('#moreMenuBtn').addEventListener('click', openMoreMenu);
   $('#streakCurrent').addEventListener('click', ()=>openStreakDetails('current'));
   $('#streakBest').addEventListener('click', ()=>openStreakDetails('best'));
@@ -1868,6 +1927,89 @@ window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); DEFERR
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkDateRollover(); });
 window.addEventListener('focus', checkDateRollover);
 
+let DEADLINE_TAB = 'overdue';
+function updateDeadlineFab(){
+  const btn = document.getElementById('deadlineFabBtn');
+  if(!btn) return;
+  const n = overdueChapters().length;
+  if(n>0){ btn.style.display='flex'; btn.textContent = String(n); }
+  else { btn.style.display='none'; }
+}
+function openDeadlinePanel(){
+  DEADLINE_TAB = 'overdue';
+  renderDeadlinePanel();
+}
+function renderDeadlinePanel(){
+  const overdue = overdueChapters();
+  const upcoming = upcomingDeadlineChapters();
+  const list = DEADLINE_TAB==='overdue' ? overdue : upcoming;
+  openModal(`
+    <div class="modal-head"><h3>Chapter Deadlines</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="tabs" style="margin-bottom:12px;">
+      <div class="tab ${DEADLINE_TAB==='overdue'?'active':''}" data-dtab="overdue">Overdue (${overdue.length})</div>
+      <div class="tab ${DEADLINE_TAB==='upcoming'?'active':''}" data-dtab="upcoming">Upcoming (${upcoming.length})</div>
+    </div>
+    <div class="list" id="deadlineList">
+      ${list.length ? list.map(c=>deadlineRowHtml(c)).join('') : emptyState('📅', DEADLINE_TAB==='overdue' ? 'No overdue chapters' : 'No upcoming deadlines', DEADLINE_TAB==='overdue' ? 'You are all caught up.' : 'Set a "Complete by" date on a chapter to see it here.')}
+    </div>
+  `);
+  $all('[data-dtab]').forEach(t=>t.addEventListener('click', ()=>{ DEADLINE_TAB=t.dataset.dtab; renderDeadlinePanel(); }));
+  bindDeadlineRowEvents();
+}
+function deadlineRowHtml(c){
+  const t = todayStr();
+  const isOverdue = c.completeByDate < t;
+  const diff = Math.abs(daysBetween(t, c.completeByDate));
+  return `
+  <div class="row-item" data-id="${c.id}" style="align-items:flex-start;">
+    <div class="ri-main">
+      <div class="ri-title">${esc(c.name)} <span class="badge ${isOverdue?'high':'medium'}">${c.subject}</span></div>
+      <div class="ri-sub" style="${isOverdue?'color:var(--red); font-weight:600;':''}">${isOverdue ? diff+' day'+(diff===1?'':'s')+' overdue' : diff===0?'Due today':diff+' day'+(diff===1?'':'s')+' left'} · was set for ${fmtDateShort(c.completeByDate)}</div>
+    </div>
+    <div class="ri-actions" style="flex-direction:column; gap:6px; align-items:stretch;">
+      <button class="btn secondary sm" data-dlaction="complete">Mark Completed</button>
+      <button class="btn secondary sm" data-dlaction="reschedule">Reschedule</button>
+    </div>
+  </div>`;
+}
+function bindDeadlineRowEvents(){
+  $all('[data-dlaction]', document.getElementById('deadlineList')).forEach(b=>b.addEventListener('click', ()=>{
+    const id = b.closest('[data-id]').dataset.id;
+    const act = b.dataset.dlaction;
+    if(act==='complete'){
+      updateData(d=>{
+        const c = d.chapters.find(x=>x.id===id);
+        if(c){ c.status='Completed'; if(!c.completedOn) c.completedOn=todayStr(); }
+      });
+      renderAll();
+      renderDeadlinePanel();
+      toast('Marked completed');
+    } else if(act==='reschedule'){
+      openRescheduleModal(id);
+    }
+  }));
+}
+function openRescheduleModal(chapterId){
+  const c = DATA.chapters.find(x=>x.id===chapterId);
+  if(!c) return;
+  openModal(`
+    <div class="modal-head"><h3>Reschedule deadline</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="margin-bottom:12px;">${esc(c.name)}</p>
+    <div class="field"><label>New complete-by date</label><input type="date" id="rs-date" value="${c.completeByDate||todayStr()}"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="renderDeadlinePanel()">Cancel</button>
+      <button class="btn" onclick="confirmReschedule('${chapterId}')">Save</button>
+    </div>
+  `);
+}
+function confirmReschedule(chapterId){
+  const newDate = $('#rs-date').value;
+  if(!newDate) return;
+  updateData(d=>{ d.chapters.find(x=>x.id===chapterId).completeByDate = newDate; });
+  renderAll();
+  renderDeadlinePanel();
+  toast('Deadline updated');
+}
 function openMoreMenu(){
   const extra = ['goal','practice','revision','timer','settings'];
   const showInstall = !!DEFERRED_INSTALL_PROMPT;
@@ -1889,6 +2031,10 @@ function openMoreMenu(){
         <span class="icon-btn" style="pointer-events:none;">📤</span>
         <div class="ri-main" style="pointer-events:none;"><div class="ri-title">Share Today's Progress</div></div>
       </button>
+      <button class="row-item" style="width:100%; border:1px solid var(--line); cursor:pointer;" id="chapterDeadlinesBtn">
+        <span class="icon-btn" style="pointer-events:none;">📅</span>
+        <div class="ri-main" style="pointer-events:none;"><div class="ri-title">Chapter Deadlines${overdueChapters().length?` (${overdueChapters().length})`:''}</div></div>
+      </button>
     </div>
   `);
   $all('[data-goto]').forEach(b=>b.addEventListener('click', ()=>{ closeModal(); switchView(b.dataset.goto); }));
@@ -1901,6 +2047,7 @@ function openMoreMenu(){
     DEFERRED_INSTALL_PROMPT = null;
   });
   document.getElementById('shareProgressBtn').addEventListener('click', ()=>{ closeModal(); openShareCardModal(); });
+  document.getElementById('chapterDeadlinesBtn').addEventListener('click', ()=>{ closeModal(); openDeadlinePanel(); });
 }
 
 function openShareCardModal(){
@@ -2023,6 +2170,26 @@ function countdownParts(dateStr){
   const days = daysUntil(dateStr);
   return days;
 }
+function readinessScore(){
+  const components = [];
+  components.push({key:'syllabus', weight:35, value:overallSyllabusPct()});
+
+  let activeDays=0;
+  for(let i=0;i<14;i++){ if(studyHoursOn(addDays(todayStr(),-i))>0) activeDays++; }
+  components.push({key:'consistency', weight:25, value:pct(activeDays,14)});
+
+  const avgPct = recentPercentileAvg(5);
+  if(avgPct!=null) components.push({key:'mocks', weight:25, value:Math.min(100,avgPct)});
+
+  const plan = DATA.settings.goal ? buildDailyPlan() : null;
+  if(plan && !plan.expired && plan.pace!=null && plan.perWeekNeeded>0){
+    components.push({key:'pace', weight:15, value:Math.min(100, (plan.pace/plan.perWeekNeeded)*100)});
+  }
+
+  const totalWeight = components.reduce((s,c)=>s+c.weight,0);
+  const score = totalWeight>0 ? Math.round(components.reduce((s,c)=>s+c.value*c.weight,0)/totalWeight) : 0;
+  return {score, components};
+}
 function renderHomeCountdownOnly(){
   const view = $('#view-home');
   if(!view.classList.contains('active')) return;
@@ -2048,6 +2215,7 @@ function renderHome(){
   const chem = chapterCompletionPct('Chemistry');
   const math = chapterCompletionPct('Mathematics');
   const lt = latestTest();
+  const readiness = readinessScore();
 
   const hr = new Date().getHours();
   const hello = hr<12 ? 'Good morning' : hr<17 ? 'Good afternoon' : 'Good evening';
@@ -2070,6 +2238,17 @@ function renderHome(){
         <div class="label">JEE Advanced</div>
         <div class="num" id="cd-adv">${Math.max(daysUntil(s.jeeAdvancedDate),0)}<span> days</span></div>
         <div class="sub">${fmtDate(s.jeeAdvancedDate)}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Readiness score</div>
+  <div class="card readiness-card" style="margin-bottom:18px;">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="readiness-num" style="color:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};">${readiness.score}</div>
+      <div style="flex:1;">
+        <p class="muted" style="margin-bottom:6px;">Based on syllabus progress, consistency${readiness.components.some(c=>c.key==='mocks')?', mock performance':''}${readiness.components.some(c=>c.key==='pace')?' and pace':''}.</p>
+        <div class="pbar"><div style="width:${readiness.score}%; background:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};"></div></div>
       </div>
     </div>
   </div>
@@ -2450,16 +2629,21 @@ function confirmDelete(kind, id, msg){
     </div>
   `);
 }
+const KIND_TO_COLLECTION = {task:'tasks', chapter:'chapters', practice:'practiceSessions', test:'tests', revision:'revisions', studySession:'studySessions'};
 function performDelete(kind, id){
-  if(kind==='task') deleteData('tasks', id);
-  else if(kind==='chapter') deleteData('chapters', id);
-  else if(kind==='practice') deleteData('practiceSessions', id);
-  else if(kind==='test') deleteData('tests', id);
-  else if(kind==='revision') deleteData('revisions', id);
-  else if(kind==='studySession') deleteData('studySessions', id);
+  const collection = KIND_TO_COLLECTION[kind];
+  const result = collection ? deleteData(collection, id) : null;
   closeModal();
   renderAll();
-  toast('Deleted');
+  if(result && result.item){
+    toast('Deleted', {label:'Undo', onClick:()=>{
+      updateData(d=>{ d[collection].splice(Math.min(result.idx, d[collection].length), 0, result.item); });
+      renderAll();
+      toast('Restored');
+    }});
+  } else {
+    toast('Deleted');
+  }
 }
 /* ============================================================
    CHAPTERS / SYLLABUS TRACKER
@@ -2594,15 +2778,23 @@ function relativeDayLabel(dateStr){
   if(diff<=6) return diff+' days ago';
   return fmtDateShort(dateStr);
 }
+function chapterAvgTimePerQuestion(c){
+  const sessions = DATA.practiceSessions.filter(p=>p.subject===c.subject && p.chapter===c.name && Number(p.timeMinutes)>0 && Number(p.attempted)>0);
+  const totalSec = sessions.reduce((s,p)=>s+Number(p.timeMinutes)*60,0);
+  const totalQ = sessions.reduce((s,p)=>s+Number(p.attempted),0);
+  if(totalQ<=0) return null;
+  return Math.round(totalSec/totalQ);
+}
 function chapterRowHtml(c){
   const ps = chapterPracticeStats(c);
   const lastDate = chapterLastStudiedDate(c);
+  const tpq = chapterAvgTimePerQuestion(c);
   return `
   <div class="card ${c.important?'is-important':''}" data-id="${c.id}" style="padding:14px; cursor:pointer;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
       <div>
         <div class="ri-title">${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</div>
-        <div class="muted" style="font-size:11.5px; margin-top:2px;">${lastDate ? 'Last studied '+relativeDayLabel(lastDate) : 'Not studied yet'}</div>
+        <div class="muted" style="font-size:11.5px; margin-top:2px;">${lastDate ? 'Last studied '+relativeDayLabel(lastDate) : 'Not studied yet'}${tpq!=null ? ' · '+formatSeconds(tpq)+'/question' : ''}</div>
       </div>
       <div class="ri-actions">
         <button class="icon-btn" data-chaction="important" aria-label="Mark important" style="${c.important?'color:var(--amber); border-color:var(--amber);':''}">${ICONS.star}</button>
@@ -2625,8 +2817,20 @@ function chapterRowHtml(c){
       <label class="checkline"><input type="checkbox" data-chfield="questionsDone" ${c.questionsDone?'checked':''}> Questions</label>
       <label class="checkline"><input type="checkbox" data-chfield="pyqsDone" ${c.pyqsDone?'checked':''}> PYQs</label>
     </div>
+    <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <label class="muted" style="font-size:12px;">Complete by</label>
+      <input type="date" data-chfield="completeByDate" value="${c.completeByDate||''}" style="font-size:12px; padding:4px 8px; border-radius:8px; border:1px solid var(--line); background:var(--paper); color:var(--ink);">
+      ${chapterDeadlineNote(c)}
+    </div>
     ${ps.attempted>0 ? `<div class="ri-sub" style="margin-top:10px;">🎯 ${ps.attempted} questions solved · ${ps.accuracy}% accuracy</div>` : ''}
   </div>`;
+}
+function chapterDeadlineNote(c){
+  if(!c.completeByDate || c.status==='Completed' || c.status==='Revised') return '';
+  const t = todayStr();
+  if(c.completeByDate < t) return `<span style="color:var(--red); font-size:11.5px; font-weight:700;">Overdue</span>`;
+  const d = daysBetween(t, c.completeByDate);
+  return `<span class="muted" style="font-size:11.5px;">${d===0?'Due today':d+'d left'}</span>`;
 }
 function bindChapterRowEvents(){
   $all('.card[data-id]', view('chapters')).forEach(card=>{
@@ -2738,7 +2942,7 @@ function saveNewChapter(){
   const subject = $('#nc-subject').value;
   updateData(d=>{
     const order = d.chapters.filter(c=>c.subject===subject).length;
-    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', important:false, weightage:'Medium', order});
+    d.chapters.push({id:uid(), subject, name, status:'Not Started', notesDone:false, questionsDone:false, pyqsDone:false, revisionStatus:'Not Started', confidence:'Average', important:false, weightage:'Medium', completeByDate:null, order});
   });
   CHAPTER_SUBJECT = subject;
   closeModal();
@@ -2750,6 +2954,18 @@ function saveNewChapter(){
    ============================================================ */
 let PRACTICE_FILTER = { subject:'' };
 
+function avgTimePerQuestion(subject){
+  const sessions = DATA.practiceSessions.filter(p=>Number(p.timeMinutes)>0 && Number(p.attempted)>0 && (!subject || p.subject===subject));
+  const totalSec = sessions.reduce((s,p)=>s+Number(p.timeMinutes)*60,0);
+  const totalQ = sessions.reduce((s,p)=>s+Number(p.attempted),0);
+  if(totalQ<=0) return null;
+  return Math.round(totalSec/totalQ);
+}
+function formatSeconds(sec){
+  if(sec==null) return '—';
+  if(sec<60) return sec+'s';
+  return Math.floor(sec/60)+'m '+(sec%60)+'s';
+}
 function renderPractice(){
   const todayQ = questionsSolvedOn(todayStr());
   const weekQ = sumInRange(questionsSolvedOn, 7);
@@ -2763,6 +2979,7 @@ function renderPractice(){
   const bySubject = {};
   DATA.practiceSessions.forEach(p=>{ bySubject[p.subject] = (bySubject[p.subject]||0) + Number(p.attempted||0); });
   const maxSubj = Math.max(1, ...Object.values(bySubject));
+  const avgTPQ = avgTimePerQuestion();
 
   const html = `
     <div class="card" style="margin-bottom:16px;">
@@ -2774,12 +2991,13 @@ function renderPractice(){
       <div class="stat"><div class="val">${weekQ}</div><div class="lbl">This week</div></div>
       <div class="stat"><div class="val">${monthQ}</div><div class="lbl">This month</div></div>
       <div class="stat"><div class="val">${totalQ}</div><div class="lbl">Total solved</div></div>
+      <div class="stat"><div class="val">${formatSeconds(avgTPQ)}</div><div class="lbl">Avg time / question</div></div>
     </div>
     ${Object.keys(bySubject).length ? `
     <div class="section-title">Subject-wise questions</div>
     <div class="card" style="margin-bottom:16px;">
       ${Object.entries(bySubject).map(([subj,n])=>`
-        <div class="hbar-row"><div class="hb-label">${subj}</div><div class="hb-track"><div style="width:${pct(n,maxSubj)}%; background:var(--indigo);"></div></div><div class="hb-val">${n}</div></div>
+        <div class="hbar-row"><div class="hb-label">${subj}</div><div class="hb-track"><div style="width:${pct(n,maxSubj)}%; background:var(--indigo);"></div></div><div class="hb-val">${n} · ${formatSeconds(avgTimePerQuestion(subj))}/q</div></div>
       `).join('')}
     </div>` : ''}
     <div class="section-title">Practice log
@@ -3246,6 +3464,7 @@ function renderAnalytics(){
   const questSeries = days7.map(d=>questionsSolvedOn(d));
   const maxHr = Math.max(1, ...studyHrsSeries);
   const maxQ = Math.max(1, ...questSeries);
+  const records = computeRecords();
 
   const thisWeekHrs = sumInRange(studyHoursOn,7), prevWeekHrs = sumInRangeOffset(studyHoursOn,7,7);
   const thisWeekQ = sumInRange(questionsSolvedOn,7), prevWeekQ = sumInRangeOffset(questionsSolvedOn,7,7);
@@ -3277,6 +3496,16 @@ function renderAnalytics(){
     <div class="section-title">Study calendar</div>
     <div class="card" style="margin-bottom:18px;">
       ${calendarHeatmapHtml()}
+    </div>
+
+    <div class="section-title">Personal records</div>
+    <div class="grid grid-2" style="margin-bottom:18px;">
+      <div class="stat"><div class="val">${hoursToHM(records.bestDayHours)}</div><div class="lbl">Best single-day study${records.bestDayDate?' · '+fmtDateShort(records.bestDayDate):''}</div></div>
+      <div class="stat"><div class="val">${records.bestQ}</div><div class="lbl">Best single-day questions${records.bestQDate?' · '+fmtDateShort(records.bestQDate):''}</div></div>
+      <div class="stat"><div class="val">${records.longestStreak}</div><div class="lbl">Longest study streak</div></div>
+      <div class="stat"><div class="val">${records.bestScore!=null?records.bestScore:'—'}</div><div class="lbl">Best mock score</div></div>
+      <div class="stat"><div class="val">${formatSeconds(avgTimePerQuestion())}</div><div class="lbl">Avg time / question</div></div>
+      ${records.bestJump!=null ? `<div class="stat"><div class="val" style="color:${records.bestJump>=0?'var(--green)':'var(--red)'};">${records.bestJump>=0?'+':''}${records.bestJump}</div><div class="lbl">Best test-to-test jump</div></div>` : ''}
     </div>
 
     <div class="two-col">
