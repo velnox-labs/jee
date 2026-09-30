@@ -588,6 +588,22 @@ table.simple td{padding:9px 8px; border-bottom:1px solid var(--line);}
 .gl-check input{width:18px; height:18px;}
 .account-email{font-family:var(--font-mono); font-size:13px; word-break:break-all; margin-bottom:14px;}
 @media print{ .sidebar,.bottomnav,.fab{display:none;} }
+
+/* Chapter list: square tiles with outer progress ring */
+.ch-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+@media(min-width:600px){ .ch-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));} }
+.ch-tile-wrap{display:flex; flex-direction:column; align-items:center; gap:4px;}
+.ch-tile{width:100%; aspect-ratio:1/1; padding:5px; border-radius:20px; cursor:pointer; --ring:var(--indigo);
+  background:conic-gradient(var(--ring) calc(var(--p) * 1%), var(--line) 0);
+  -webkit-tap-highlight-color:transparent; transition:transform .12s;}
+.ch-tile:active{transform:scale(.97);}
+.ch-tile.full{--ring:var(--green);}
+.ch-tile-in{width:100%; height:100%; border-radius:15px; background:var(--card); color:var(--ink);
+  display:flex; align-items:center; justify-content:center; text-align:center; padding:10px; overflow:hidden;}
+.ch-tile-in span{font-weight:700; font-size:13.5px; line-height:1.3; word-break:break-word;
+  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;}
+.ch-tile.gold .ch-tile-in{background:linear-gradient(135deg,#FCE38A,#F2B705); color:#4A3500;}
+.ch-pct{font-size:11.5px; font-weight:700; color:var(--ink-soft);}
 </style>
 </head>
 <body>
@@ -1969,6 +1985,7 @@ function deadlineRowHtml(c){
     <div class="ri-actions" style="flex-direction:column; gap:6px; align-items:stretch;">
       <button class="btn secondary sm" data-dlaction="complete">Mark Completed</button>
       <button class="btn secondary sm" data-dlaction="reschedule">Reschedule</button>
+      <button class="btn secondary sm" data-dlaction="remove" style="color:var(--red);">Remove</button>
     </div>
   </div>`;
 }
@@ -1986,8 +2003,19 @@ function bindDeadlineRowEvents(){
       toast('Marked completed');
     } else if(act==='reschedule'){
       openRescheduleModal(id);
+    } else if(act==='remove'){
+      removeDeadline(id);
     }
   }));
+}
+function removeDeadline(chapterId){
+  updateData(d=>{
+    const c = d.chapters.find(x=>x.id===chapterId);
+    if(c) c.completeByDate = '';
+  });
+  renderAll();
+  renderDeadlinePanel();
+  toast('Deadline removed');
 }
 function openRescheduleModal(chapterId){
   const c = DATA.chapters.find(x=>x.id===chapterId);
@@ -2000,6 +2028,7 @@ function openRescheduleModal(chapterId){
       <button class="btn secondary" onclick="renderDeadlinePanel()">Cancel</button>
       <button class="btn" onclick="confirmReschedule('${chapterId}')">Save</button>
     </div>
+    <button class="btn secondary block" style="margin-top:10px; color:var(--red);" onclick="removeDeadline('${chapterId}')">Remove deadline</button>
   `);
 }
 function confirmReschedule(chapterId){
@@ -2210,12 +2239,13 @@ function renderHome(){
   const doneTasks = tTasks.filter(t=>t.completed).length;
   const pendingCount = pendingTasksAll().length;
   const revDue = revisionsDueToday().length;
+  const revDueTodayAll = DATA.revisions.filter(r=>r.dueDate===todayStr());
+  const revDoneToday = revDueTodayAll.filter(r=>r.completed).length;
   const overall = overallSyllabusPct();
   const phy = chapterCompletionPct('Physics');
   const chem = chapterCompletionPct('Chemistry');
   const math = chapterCompletionPct('Mathematics');
   const lt = latestTest();
-  const readiness = readinessScore();
 
   const hr = new Date().getHours();
   const hello = hr<12 ? 'Good morning' : hr<17 ? 'Good afternoon' : 'Good evening';
@@ -2242,17 +2272,6 @@ function renderHome(){
     </div>
   </div>
 
-  <div class="section-title">Readiness score</div>
-  <div class="card readiness-card" style="margin-bottom:18px;">
-    <div style="display:flex; align-items:center; gap:16px;">
-      <div class="readiness-num" style="color:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};">${readiness.score}</div>
-      <div style="flex:1;">
-        <p class="muted" style="margin-bottom:6px;">Based on syllabus progress, consistency${readiness.components.some(c=>c.key==='mocks')?', mock performance':''}${readiness.components.some(c=>c.key==='pace')?' and pace':''}.</p>
-        <div class="pbar"><div style="width:${readiness.score}%; background:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};"></div></div>
-      </div>
-    </div>
-  </div>
-
   <div class="section-title">Quick actions</div>
   <div class="qa-row">
     <button class="qa-btn" data-qa="session"><span class="qico">${ICONS.timer}</span>Start Session</button>
@@ -2274,24 +2293,15 @@ function renderHome(){
         <div class="pbar-row"><span>Questions</span><span>${todayQ} / ${s.dailyQuestionTarget}</span></div>
         <div class="pbar amber"><div style="width:${pct(todayQ, s.dailyQuestionTarget)}%"></div></div>
       </div>
-      <div>
-        <div class="pbar-row"><span>Tasks</span><span>${doneTasks} / ${Math.max(s.dailyTaskTarget, tTasks.length)}</span></div>
-        <div class="pbar green"><div style="width:${pct(doneTasks, Math.max(s.dailyTaskTarget,tTasks.length,1))}%"></div></div>
-      </div>
-      <div>
-        <div class="pbar-row"><span>Revision</span><span>${revDue===0?'0':(DATA.revisions.filter(r=>r.dueDate===todayStr()&&r.completed).length)} / ${Math.max(s.dailyRevisionTarget, revDue)}</span></div>
-        <div class="pbar"><div style="width:${pct(DATA.revisions.filter(r=>r.dueDate===todayStr()&&r.completed).length, Math.max(s.dailyRevisionTarget,revDue,1))}%"></div></div>
-      </div>
+      ${tTasks.length>0 ? `<div>
+        <div class="pbar-row"><span>Tasks</span><span>${doneTasks} / ${tTasks.length}</span></div>
+        <div class="pbar green"><div style="width:${pct(doneTasks, tTasks.length)}%"></div></div>
+      </div>` : ''}
+      ${revDueTodayAll.length>0 ? `<div>
+        <div class="pbar-row"><span>Revision</span><span>${revDoneToday} / ${revDueTodayAll.length}</span></div>
+        <div class="pbar"><div style="width:${pct(revDoneToday, revDueTodayAll.length)}%"></div></div>
+      </div>` : ''}
     </div>
-  </div>
-
-  <div class="section-title">Today at a glance</div>
-  <div class="grid grid-4">
-    <div class="stat"><div class="icon" style="background:var(--amber-tint); color:var(--amber);">${ICONS.flame}</div><div class="val">${streaks.study.current}</div><div class="lbl">Study streak</div></div>
-    <div class="stat"><div class="icon" style="background:var(--green-tint); color:var(--green);">${ICONS.check}</div><div class="val">${doneTasks}/${tTasks.length}</div><div class="lbl">Tasks done</div></div>
-    <div class="stat"><div class="icon" style="background:var(--indigo-tint); color:var(--indigo);">${ICONS.clock}</div><div class="val">${hoursToHM(todayHrs)}</div><div class="lbl">Studied today</div></div>
-    <div class="stat"><div class="icon" style="background:var(--red-tint); color:var(--red);">${ICONS.revision}</div><div class="val">${revDue}</div><div class="lbl">Revision due</div></div>
-    <div class="stat"><div class="icon" style="background:var(--amber-tint); color:var(--amber);">${ICONS.star}</div><div class="val">${importantSyllabusPct()}%</div><div class="lbl">Important syllabus</div></div>
   </div>
 
   <div class="section-title">Syllabus completion</div>
@@ -2300,12 +2310,7 @@ function renderHome(){
     <div class="hbar-row"><div class="hb-label">Physics</div><div class="hb-track"><div style="width:${phy}%; background:#3E6FD9;"></div></div><div class="hb-val">${phy}%</div></div>
     <div class="hbar-row"><div class="hb-label">Chemistry</div><div class="hb-track"><div style="width:${chem}%; background:var(--green);"></div></div><div class="hb-val">${chem}%</div></div>
     <div class="hbar-row"><div class="hb-label">Mathematics</div><div class="hb-track"><div style="width:${math}%; background:var(--amber);"></div></div><div class="hb-val">${math}%</div></div>
-  </div>
-
-  <div class="section-title">Pending &amp; upcoming</div>
-  <div class="grid grid-2">
-    <div class="card-flat"><div class="lbl muted">Pending tasks</div><div style="font-size:22px; font-weight:700; margin-top:4px;">${pendingCount}</div></div>
-    <div class="card-flat"><div class="lbl muted">Revision due today</div><div style="font-size:22px; font-weight:700; margin-top:4px;">${revDue}</div></div>
+    <div class="hbar-row"><div class="hb-label">Important</div><div class="hb-track"><div style="width:${importantSyllabusPct()}%; background:var(--red);"></div></div><div class="hb-val">${importantSyllabusPct()}%</div></div>
   </div>
 
   ${lt ? `
@@ -2719,8 +2724,8 @@ function renderChapters(){
       <button type="button" id="chPyqPendingFilter" class="pill-toggle ${CHAPTER_FILTER.pyqPending?'active':''}">${ICONS.practice} PYQ Pending</button>
       <button class="btn secondary sm" onclick="openChapterModal()">+ Add Chapter</button>
     </div>
-    <div class="list">
-      ${chs.length ? chs.map(chapterRowHtml).join('') : emptyState('📘','No chapters found','Try a different filter or add a chapter.')}
+    <div class="ch-grid">
+      ${chs.length ? chs.map(chapterRowHtml).join('') : `<div style="grid-column:1/-1;">${emptyState('📘','No chapters found','Try a different filter or add a chapter.')}</div>`}
     </div>
   `;
   view('chapters').innerHTML = html;
@@ -2745,8 +2750,8 @@ function renderChaptersListOnly(){
   if(CHAPTER_FILTER.pyqPending) chs = chs.filter(c=>(c.status==='Completed'||c.status==='Revised') && !c.pyqsDone);
   if(CHAPTER_FILTER.search) chs = chs.filter(c=>c.name.toLowerCase().includes(CHAPTER_FILTER.search.toLowerCase()));
   chs = chs.slice().sort((a,b)=>a.order-b.order);
-  const listEl = view('chapters').querySelector('.list');
-  listEl.innerHTML = chs.length ? chs.map(chapterRowHtml).join('') : emptyState('📘','No chapters found','Try a different filter or add a chapter.');
+  const listEl = view('chapters').querySelector('.ch-grid');
+  listEl.innerHTML = chs.length ? chs.map(chapterRowHtml).join('') : `<div style="grid-column:1/-1;">${emptyState('📘','No chapters found','Try a different filter or add a chapter.')}</div>`;
   bindChapterRowEvents();
 }
 function chapterPracticeStats(c){
@@ -2785,44 +2790,18 @@ function chapterAvgTimePerQuestion(c){
   if(totalQ<=0) return null;
   return Math.round(totalSec/totalQ);
 }
+function chapterProgressPct(c){
+  const done = [c.notesDone, c.questionsDone, c.pyqsDone, (c.status==='Completed'||c.status==='Revised')].filter(Boolean).length;
+  return Math.round(done/4*100);
+}
 function chapterRowHtml(c){
-  const ps = chapterPracticeStats(c);
-  const lastDate = chapterLastStudiedDate(c);
-  const tpq = chapterAvgTimePerQuestion(c);
+  const pctV = chapterProgressPct(c);
   return `
-  <div class="card ${c.important?'is-important':''}" data-id="${c.id}" style="padding:14px; cursor:pointer;">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-      <div>
-        <div class="ri-title">${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</div>
-        <div class="muted" style="font-size:11.5px; margin-top:2px;">${lastDate ? 'Last studied '+relativeDayLabel(lastDate) : 'Not studied yet'}${tpq!=null ? ' · '+formatSeconds(tpq)+'/question' : ''}</div>
-      </div>
-      <div class="ri-actions">
-        <button class="icon-btn" data-chaction="important" aria-label="Mark important" style="${c.important?'color:var(--amber); border-color:var(--amber);':''}">${ICONS.star}</button>
-        <button class="icon-btn" data-chaction="delete">${ICONS.trash}</button>
-      </div>
+  <div class="ch-tile-wrap" data-id="${c.id}">
+    <div class="ch-tile ${c.important?'gold':''} ${pctV===100?'full':''}" style="--p:${pctV}" role="button" tabindex="0">
+      <div class="ch-tile-in"><span>${esc(c.name)}</span></div>
     </div>
-    <div class="chip-row" style="margin-top:8px;">
-      <select class="chip" data-chfield="status" style="border:none; font-weight:700;">
-        ${['Not Started','Studying','Completed','Revised'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}
-      </select>
-      <select class="chip" data-chfield="confidence" style="border:none; font-weight:700;">
-        ${['Weak','Average','Strong'].map(s=>`<option ${c.confidence===s?'selected':''}>${s}</option>`).join('')}
-      </select>
-      <select class="chip" data-chfield="weightage" style="border:none; font-weight:700; ${WEIGHTAGE_COLORS[c.weightage||'Medium']}">
-        ${['High','Medium','Low'].map(s=>`<option value="${s}" ${(c.weightage||'Medium')===s?'selected':''}>${s} weightage</option>`).join('')}
-      </select>
-    </div>
-    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:10px;">
-      <label class="checkline"><input type="checkbox" data-chfield="notesDone" ${c.notesDone?'checked':''}> Notes</label>
-      <label class="checkline"><input type="checkbox" data-chfield="questionsDone" ${c.questionsDone?'checked':''}> Questions</label>
-      <label class="checkline"><input type="checkbox" data-chfield="pyqsDone" ${c.pyqsDone?'checked':''}> PYQs</label>
-    </div>
-    <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <label class="muted" style="font-size:12px;">Complete by</label>
-      <input type="date" data-chfield="completeByDate" value="${c.completeByDate||''}" style="font-size:12px; padding:4px 8px; border-radius:8px; border:1px solid var(--line); background:var(--paper); color:var(--ink);">
-      ${chapterDeadlineNote(c)}
-    </div>
-    ${ps.attempted>0 ? `<div class="ri-sub" style="margin-top:10px;">🎯 ${ps.attempted} questions solved · ${ps.accuracy}% accuracy</div>` : ''}
+    <div class="ch-pct">${pctV}%</div>
   </div>`;
 }
 function chapterDeadlineNote(c){
@@ -2833,48 +2812,26 @@ function chapterDeadlineNote(c){
   return `<span class="muted" style="font-size:11.5px;">${d===0?'Due today':d+'d left'}</span>`;
 }
 function bindChapterRowEvents(){
-  $all('.card[data-id]', view('chapters')).forEach(card=>{
-    card.addEventListener('click', (e)=>{
-      if(e.target.closest('select,input,button')) return;
-      openChapterDetail(card.dataset.id);
-    });
+  $all('.ch-tile-wrap', view('chapters')).forEach(w=>{
+    w.addEventListener('click', ()=>openChapterDetail(w.dataset.id));
   });
-  $all('[data-chaction="delete"]', view('chapters')).forEach(b=>b.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    const id = b.closest('[data-id]').dataset.id;
-    confirmDelete('chapter', id, 'Delete this chapter and its revision schedule?');
-  }));
-  $all('[data-chaction="important"]', view('chapters')).forEach(b=>b.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    const id = b.closest('[data-id]').dataset.id;
-    updateData(d=>{
-      const ch = d.chapters.find(c=>c.id===id);
-      ch.important = !ch.important;
-    });
-    renderChapters();
-  }));
-  $all('[data-chfield]', view('chapters')).forEach(el=>{
-    el.addEventListener('click', e=>e.stopPropagation());
-    el.addEventListener('change', ()=>{
-      const id = el.closest('[data-id]').dataset.id;
-      const field = el.dataset.chfield;
-      const val = el.type==='checkbox' ? el.checked : el.value;
-      updateData(d=>{
-        const ch = d.chapters.find(c=>c.id===id);
-        ch[field] = val;
-        if(field==='status'){
-          if(val==='Completed'||val==='Revised'){
-            if(!ch.completedOn) ch.completedOn = todayStr();   // used to measure your pace
-            scheduleRevisionsForChapter(id);
-          } else {
-            ch.completedOn = null;
-          }
-        }
-      });
-      renderAll();
-      if(field==='status') toast('Chapter status updated');
-    });
+}
+function setChapterField(id, field, val){
+  updateData(d=>{
+    const ch = d.chapters.find(c=>c.id===id);
+    if(!ch) return;
+    ch[field] = val;
+    if(field==='status'){
+      if(val==='Completed'||val==='Revised'){
+        if(!ch.completedOn) ch.completedOn = todayStr();   // used to measure your pace
+        scheduleRevisionsForChapter(id);
+      } else {
+        ch.completedOn = null;
+      }
+    }
   });
+  renderAll();
+  openChapterDetail(id);
 }
 function openChapterDetail(id){
   const c = DATA.chapters.find(x=>x.id===id);
@@ -2892,8 +2849,31 @@ function openChapterDetail(id){
   if(c.status!=='Revised' && c.status!=='Completed') remaining.push('Mark chapter complete');
 
   openModal(`
-    <div class="modal-head"><h3>${esc(c.name)}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
-    <p class="muted" style="margin-bottom:14px;">${esc(c.subject)} · <span class="badge studying">${esc(c.status)}</span> · <span class="badge ${c.confidence==='Weak'?'weak':''}">${esc(c.confidence)}</span></p>
+    <div class="modal-head"><h3>${c.important?'<span class="star-mark">★</span> ':''}${esc(c.name)}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <p class="muted" style="margin-bottom:14px;">${esc(c.subject)} · ${chapterProgressPct(c)}% done</p>
+
+    <div class="chip-row">
+      <select class="chip" style="border:none; font-weight:700;" onchange="setChapterField('${c.id}','status',this.value)">
+        ${['Not Started','Studying','Completed','Revised'].map(x=>`<option ${c.status===x?'selected':''}>${x}</option>`).join('')}
+      </select>
+      <select class="chip" style="border:none; font-weight:700;" onchange="setChapterField('${c.id}','confidence',this.value)">
+        ${['Weak','Average','Strong'].map(x=>`<option ${c.confidence===x?'selected':''}>${x}</option>`).join('')}
+      </select>
+      <select class="chip" style="border:none; font-weight:700; ${WEIGHTAGE_COLORS[c.weightage||'Medium']}" onchange="setChapterField('${c.id}','weightage',this.value)">
+        ${['High','Medium','Low'].map(x=>`<option value="${x}" ${(c.weightage||'Medium')===x?'selected':''}>${x} weightage</option>`).join('')}
+      </select>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+      <label class="checkline"><input type="checkbox" ${c.notesDone?'checked':''} onchange="setChapterField('${c.id}','notesDone',this.checked)"> Notes</label>
+      <label class="checkline"><input type="checkbox" ${c.questionsDone?'checked':''} onchange="setChapterField('${c.id}','questionsDone',this.checked)"> Questions</label>
+      <label class="checkline"><input type="checkbox" ${c.pyqsDone?'checked':''} onchange="setChapterField('${c.id}','pyqsDone',this.checked)"> PYQs</label>
+    </div>
+    <div style="margin:12px 0 4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <label class="muted" style="font-size:12px;">Complete by</label>
+      <input type="date" value="${c.completeByDate||''}" onchange="setChapterField('${c.id}','completeByDate',this.value)" style="font-size:12px; padding:4px 8px; border-radius:8px; border:1px solid var(--line); background:var(--paper); color:var(--ink);">
+      ${c.completeByDate ? `<button type="button" class="btn ghost sm" style="color:var(--red);" onclick="setChapterField('${c.id}','completeByDate','')">Remove</button>` : ''}
+      ${chapterDeadlineNote(c)}
+    </div>
 
     <div class="section-title" style="margin-top:0;">Progress so far</div>
     <div class="grid grid-2" style="margin-bottom:14px;">
@@ -2917,6 +2897,10 @@ function openChapterDetail(id){
     </div>` : ''}
 
     <div class="modal-actions"><button class="btn block" onclick="closeModal()">Close</button></div>
+    <div style="display:flex; justify-content:center; gap:8px; margin-top:14px;">
+      <button type="button" class="btn secondary sm" style="padding:5px 10px; font-size:11.5px; ${c.important?'color:var(--amber); border-color:var(--amber);':''}" onclick="setChapterField('${c.id}','important',${!c.important})">${c.important?'★ Important':'☆ Mark important'}</button>
+      <button type="button" class="btn secondary sm" style="padding:5px 10px; font-size:11.5px; color:var(--red);" onclick="confirmDelete('chapter','${c.id}','Delete this chapter and its revision schedule?')">Delete</button>
+    </div>
   `);
 }
 function openChapterModal(){
@@ -3039,25 +3023,26 @@ function practiceRowHtml(p){
     </div>
   </div>`;
 }
-function openPracticeModal(id){
+function openPracticeModal(id, prefill){
   const editing = id ? DATA.practiceSessions.find(p=>p.id===id) : null;
-  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option ${editing&&editing.chapter===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
+  const pre = (!editing && prefill) ? prefill : null;
+  const chapterOptions = subj => DATA.chapters.filter(c=>c.subject===subj).map(c=>`<option ${editing&&editing.chapter===c.name?'selected':''} ${pre&&pre.chapter===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
   openModal(`
     <div class="modal-head"><h3>${editing?'Edit Practice Entry':'Log Practice Session'}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
     <div class="field-row">
       <div class="field"><label>Date</label><input type="date" id="pf-date" value="${editing?editing.date:todayStr()}"></div>
       <div class="field"><label>Subject</label>
         <select id="pf-subject" onchange="refreshPracticeChapterOptions()">
-          <option ${!editing||editing.subject==='Physics'?'selected':''}>Physics</option>
-          <option ${editing&&editing.subject==='Chemistry'?'selected':''}>Chemistry</option>
-          <option ${editing&&editing.subject==='Mathematics'?'selected':''}>Mathematics</option>
+          <option ${(editing&&editing.subject==='Physics')||(!editing&&(!pre||pre.subject==='Physics'))?'selected':''}>Physics</option>
+          <option ${(editing&&editing.subject==='Chemistry')||(pre&&pre.subject==='Chemistry')?'selected':''}>Chemistry</option>
+          <option ${(editing&&editing.subject==='Mathematics')||(pre&&pre.subject==='Mathematics')?'selected':''}>Mathematics</option>
         </select>
       </div>
     </div>
-    <div class="field"><label>Chapter</label><select id="pf-chapter"><option value="">—</option>${chapterOptions(editing?editing.subject:'Physics')}</select></div>
+    <div class="field"><label>Chapter</label><select id="pf-chapter"><option value="">—</option>${chapterOptions(editing?editing.subject:(pre?pre.subject:'Physics'))}</select></div>
     <div class="field-row">
       <div class="field"><label>Attempted</label><input type="number" id="pf-attempted" min="0" value="${editing?editing.attempted:''}"></div>
-      <div class="field"><label>Time spent (min)</label><input type="number" id="pf-time" min="0" value="${editing?editing.timeMinutes:''}"></div>
+      <div class="field"><label>Time spent (min)</label><input type="number" id="pf-time" min="0" value="${editing?editing.timeMinutes:(pre?pre.timeMinutes:'')}"></div>
     </div>
     <div class="field-row">
       <div class="field"><label>Correct</label><input type="number" id="pf-correct" min="0" value="${editing?editing.correct:''}"></div>
@@ -3483,8 +3468,20 @@ function renderAnalytics(){
   const maxSubjPerf = Math.max(1, ...subjPerf.map(s=>s.avg));
 
   const revConsistency = last8WeeksRevisionRate();
+  const readiness = readinessScore();
 
   const html = `
+  <div class="section-title">Readiness score</div>
+  <div class="card readiness-card" style="margin-bottom:18px;">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="readiness-num" style="color:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};">${readiness.score}</div>
+      <div style="flex:1;">
+        <p class="muted" style="margin-bottom:6px;">Based on syllabus progress, consistency${readiness.components.some(c=>c.key==='mocks')?', mock performance':''}${readiness.components.some(c=>c.key==='pace')?' and pace':''}.</p>
+        <div class="pbar"><div style="width:${readiness.score}%; background:${readiness.score>=70?'var(--green)':readiness.score>=40?'var(--amber)':'var(--red)'};"></div></div>
+      </div>
+    </div>
+  </div>
+
     <div class="section-title">This week vs previous week</div>
     <div class="grid grid-4" style="margin-bottom:18px;">
       ${compareCard('Study Hours', thisWeekHrs, prevWeekHrs, h=>hoursToHM(h))}
@@ -4088,6 +4085,12 @@ function logStudyMinutesPrompt(minutes){
   openModal(`
     <div class="modal-head"><h3>Session complete</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
     <p class="muted" style="margin-bottom:14px;">You studied for ${hoursToHM(minutes/60)}. What did you cover?</p>
+    <div class="field"><label>Was this session…</label>
+      <div class="seg">
+        <button type="button" id="ss-kind-basic" class="active" onclick="setSessionKind('basic')">Basic study</button>
+        <button type="button" id="ss-kind-practice" onclick="setSessionKind('practice')">Question practice</button>
+      </div>
+    </div>
     <div class="field"><label>Subject</label>
       <select id="ss-subject" onchange="refreshSessionChapterOptions()">
         <option>Physics</option><option>Chemistry</option><option>Mathematics</option><option value="">General / Other</option>
@@ -4096,10 +4099,18 @@ function logStudyMinutesPrompt(minutes){
     <div class="field"><label>Chapter / Topic</label><select id="ss-chapter"><option value="">—</option>${chapterOptions('Physics')}</select></div>
     <div class="modal-actions">
       <button class="btn secondary" onclick="discardSession()">Discard</button>
-      <button class="btn" onclick="saveStudySession(${minutes})">Save Session</button>
+      <button class="btn" id="ss-save-btn" onclick="saveStudySession(${minutes})">Save Session</button>
     </div>
   `);
+  SESSION_KIND = 'basic';
   refreshSessionChapterOptions();
+}
+let SESSION_KIND = 'basic';
+function setSessionKind(kind){
+  SESSION_KIND = kind;
+  $('#ss-kind-basic').classList.toggle('active', kind==='basic');
+  $('#ss-kind-practice').classList.toggle('active', kind==='practice');
+  $('#ss-save-btn').textContent = kind==='practice' ? 'Save & fill practice form' : 'Save Session';
 }
 function refreshSessionChapterOptions(){
   const subj = $('#ss-subject').value;
@@ -4112,12 +4123,19 @@ function discardSession(){
 function saveStudySession(minutes){
   const subject = $('#ss-subject').value;
   const chapter = $('#ss-chapter').value;
+  const kind = SESSION_KIND;
   updateData(d=>{
     d.studySessions.push({id:uid(), date:todayStr(), minutes, subject, chapter});
   });
   closeModal();
   renderAll();
-  toast('Study session saved');
+  if(kind==='practice'){
+    // study time is already saved above; open the practice form with subject, chapter and time pre-filled
+    openPracticeModal(null, {subject: subject||'Physics', chapter, timeMinutes: Math.max(1, Math.round(minutes))});
+    toast('Session saved — now add your questions');
+  } else {
+    toast('Study session saved');
+  }
 }
 
 </script>
